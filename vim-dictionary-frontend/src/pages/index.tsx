@@ -28,6 +28,12 @@ const Header = styled.header`
   z-index: 1000;
 `;
 
+const SearchRow = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`;
+
 const IconLink = styled.a`
   color: #f8f8f2;
   margin-left: 1rem;
@@ -71,6 +77,17 @@ const ModeSelect = styled.select`
   width: 100%;
 `;
 
+const ClearButton = styled.button`
+  background-color: #44475a;
+  border: 1px solid #f8f8f2;
+  border-radius: 5px;
+  color: #f8f8f2;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+`;
+
 export default function Home() {
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState("normal");
@@ -81,6 +98,10 @@ export default function Home() {
 
   const handleModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setMode(e.target.value);
+  };
+
+  const handleClearButtonClick = () => {
+    setSearch("");
   };
 
   const getExpressiveKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -146,14 +167,17 @@ export default function Home() {
           <option value="replace">Replace</option>
         </ModeSelect>
         <label htmlFor="search">Search:</label>
-        <SearchInput
-          id="search"
-          type="text"
-          value={search}
-          onChange={handleSearchChange}
-          onKeyDown={handleSearchKeyDown}
-          placeholder="Type keymap (e.g. dd)"
-        />
+        <SearchRow>
+          <SearchInput
+            id="search"
+            type="text"
+            value={search}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Type keymap (e.g. dd)"
+            style={{ flexGrow: 1 }}
+          />
+          <ClearButton onClick={handleClearButtonClick}>Clear</ClearButton>
+        </SearchRow>
       </Terminal>
     </Container>
   );
