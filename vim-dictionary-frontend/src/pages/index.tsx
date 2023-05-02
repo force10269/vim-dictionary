@@ -83,6 +83,38 @@ export default function Home() {
     setMode(e.target.value);
   };
 
+  const getExpressiveKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const key = e.key;
+    switch (key) {
+      case " ":
+        return "<Space>";
+      case "Control":
+        return "<Ctrl>";
+      case "Alt":
+        return "<Alt>";
+      default:
+        return key;
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.key === "Backspace") {
+      setSearch((prevSearch) => prevSearch.slice(0, -1));
+      return;
+    } else if (
+      e.key === "Shift" ||
+      e.key === "Enter" ||
+      e.key === "CapsLock" ||
+      e.key === "Meta"
+    ) {
+      return;
+    }
+
+    const expressiveKey = getExpressiveKey(e);
+    setSearch((prevSearch) => prevSearch + expressiveKey);
+  };
+
   return (
     <Container>
       <Head>
@@ -119,6 +151,7 @@ export default function Home() {
           type="text"
           value={search}
           onChange={handleSearchChange}
+          onKeyDown={handleSearchKeyDown}
           placeholder="Type keymap (e.g. dd)"
         />
       </Terminal>
