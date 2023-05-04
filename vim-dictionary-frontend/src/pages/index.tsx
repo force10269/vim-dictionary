@@ -85,24 +85,31 @@ export default function Home() {
     globalSearchTerm: string,
     searchTerm: string,
     mode: string
-  ): KeyMapping[] => {
+  ) => {
+    const searchChars = searchTerm.toLowerCase().split("");
+    const globalSearchTermLower = globalSearchTerm.toLowerCase();
+
     return keyMappings.filter((mapping) => {
-      if (
-        mapping.mode !== mode ||
-        (globalSearchTerm &&
-          !mapping.key.toLowerCase().includes(globalSearchTerm.toLowerCase()) &&
-          !mapping.description
-            .toLowerCase()
-            .includes(globalSearchTerm.toLowerCase()))
-      ) {
+      const keyLower = mapping.key.toLowerCase();
+      const descriptionLower = mapping.description.toLowerCase();
+
+      const isModeMatch = mapping.mode === mode;
+      const isGlobalSearchMatch =
+        globalSearchTerm === "" ||
+        keyLower.includes(globalSearchTermLower) ||
+        descriptionLower.includes(globalSearchTermLower);
+
+      if (!isModeMatch || !isGlobalSearchMatch) {
         return false;
       }
 
-      return (
-        mapping.key === searchTerm ||
-        mapping.key.toUpperCase() === searchTerm ||
-        mapping.key.toLowerCase() === searchTerm
-      );
+      for (let i = 0; i < searchChars.length; i++) {
+        if (searchChars[i] !== keyLower[i]) {
+          return false;
+        }
+      }
+
+      return true;
     });
   };
 
