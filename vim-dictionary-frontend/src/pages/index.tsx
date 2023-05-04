@@ -24,15 +24,15 @@ interface KeyMapping {
 
 export default function Home() {
   const [search, setSearch] = useState("");
-  const [searchBtnInput, setSearchBtnInput] = useState("");
   const [mode, setMode] = useState("normal");
+  const [searchMode, setSearchMode] = useState("soft");
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
   const handleSearchButtonClick = () => {
-    setSearchBtnInput(search);
+    setSearchMode("hard-match");
   };
 
   const handleModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -41,6 +41,7 @@ export default function Home() {
 
   const handleClearButtonClick = () => {
     setSearch("");
+    setSearchMode("soft-match");
   };
 
   const getExpressiveKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -63,6 +64,8 @@ export default function Home() {
       return;
     }
 
+    setSearchMode("soft-match");
+
     e.preventDefault();
     if (e.key === "Backspace") {
       setSearch((prevSearch) => prevSearch.slice(0, -1));
@@ -84,9 +87,9 @@ export default function Home() {
     keyMappings: KeyMapping[],
     searchTerm: string,
     mode: string,
-    searchBtnTerm: string
+    searchMode: string
   ): KeyMapping[] => {
-    if (!searchTerm && !searchBtnTerm) {
+    if (!searchTerm) {
       return keyMappings;
     }
 
@@ -95,11 +98,11 @@ export default function Home() {
         return false;
       }
 
-      if (searchBtnTerm) {
+      if (searchMode === "hard-match") {
         return (
-          mapping.key === searchBtnTerm ||
-          mapping.key.toUpperCase() === searchBtnTerm ||
-          mapping.key.toLowerCase() === searchBtnTerm
+          mapping.key === searchTerm ||
+          mapping.key.toUpperCase() === searchTerm ||
+          mapping.key.toLowerCase() === searchTerm
         );
       }
 
@@ -116,7 +119,7 @@ export default function Home() {
     keyMappings,
     search,
     mode,
-    searchBtnInput
+    searchMode
   );
 
   return (
