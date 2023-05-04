@@ -170,22 +170,26 @@ export default function Home() {
           <ClearButton onClick={handleClearButtonClick}>Clear</ClearButton>
           <ClearButton onClick={handleSearchButtonClick}>Search</ClearButton>
         </SearchRow>
-        <KeyMappingsTable>
-          <thead>
-            <KeyMappingsHeaderRow>
-              <TableCell>Key</TableCell>
-              <TableCell>Description</TableCell>
-            </KeyMappingsHeaderRow>
-          </thead>
-          <tbody>
-            {filteredMappings.map((mapping: KeyMapping) => (
-              <KeyMappingsRow key={`${mapping.key}-${mapping.mode}`}>
-                <TableCell>{mapping.key}</TableCell>
-                <TableCell>{mapping.description}</TableCell>
-              </KeyMappingsRow>
-            ))}
-          </tbody>
-        </KeyMappingsTable>
+        {filteredMappings.length > 0 ? (
+          <KeyMappingsTable>
+            <thead>
+              <KeyMappingsHeaderRow>
+                <TableCell>Key</TableCell>
+                <TableCell>Description</TableCell>
+              </KeyMappingsHeaderRow>
+            </thead>
+            <tbody>
+              {filteredMappings.map((mapping: KeyMapping) => (
+                <KeyMappingsRow key={`${mapping.key}-${mapping.mode}`}>
+                  <TableCell>{mapping.key}</TableCell>
+                  <TableCell>{mapping.description}</TableCell>
+                </KeyMappingsRow>
+              ))}
+            </tbody>
+          </KeyMappingsTable>
+        ) : search ? (
+          <p>No results</p>
+        ) : null}
       </Terminal>
     </Container>
   );

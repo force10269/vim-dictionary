@@ -34,7 +34,11 @@ export const keyMappings = [
     description: "Paste the last deleted or yanked text after the cursor",
   },
   { key: "u", mode: "normal", description: "Undo the last change" },
-  { key: "Ctrl+r", mode: "normal", description: "Redo the last undone change" },
+  {
+    key: "<Ctrl>r",
+    mode: "normal",
+    description: "Redo the last undone change",
+  },
   { key: "v", mode: "normal", description: "Enter visual mode" },
   { key: ":", mode: "normal", description: "Enter command-line mode" },
 ];
