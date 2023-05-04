@@ -140,7 +140,7 @@ export default function Home() {
         {filteredMappings.map((mapping: KeyMapping) => (
           <div key={`${mapping.key}-${mapping.mode}`}>
             <span>{mapping.key}</span>
-            <span>{mapping.mode}</span>
+            &nbsp;
             <span>{mapping.description}</span>
           </div>
         ))}
