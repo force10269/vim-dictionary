@@ -87,6 +87,7 @@ export const ClearButton = styled.button`
 export const KeyMappingsTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 `;
 
 export const KeyMappingsHeaderRow = styled.tr`
@@ -101,4 +102,12 @@ export const KeyMappingsRow = styled.tr`
 
 export const TableCell = styled.td`
   padding: 8px;
+
+  &:nth-child(1) {
+    width: 150px;
+  }
+
+  &:nth-child(2) {
+    width: 450px;
+  }
 `;
