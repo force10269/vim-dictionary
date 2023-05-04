@@ -8,6 +8,7 @@ import {
   Title,
   Container,
   Header,
+  GlobalSearchInput,
   IconLink,
   Terminal,
   SearchInput,
@@ -29,15 +30,15 @@ interface KeyMapping {
 
 export default function Home() {
   const [search, setSearch] = useState("");
+  const [globalSearch, setGlobalSearch] = useState("");
   const [mode, setMode] = useState("normal");
-  const [searchMode, setSearchMode] = useState("soft");
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
-  const handleSearchButtonClick = () => {
-    setSearchMode("hard-match");
+  const handleGlobalSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setGlobalSearch(e.target.value);
   };
 
   const handleModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -46,7 +47,6 @@ export default function Home() {
 
   const handleClearButtonClick = () => {
     setSearch("");
-    setSearchMode("soft-match");
   };
 
   const getExpressiveKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -64,13 +64,6 @@ export default function Home() {
   };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSearchButtonClick();
-      return;
-    }
-
-    setSearchMode("soft-match");
-
     e.preventDefault();
     if (e.key === "Backspace") {
       setSearch((prevSearch) => prevSearch.slice(0, -1));
@@ -90,42 +83,40 @@ export default function Home() {
 
   const filterKeyMappings = (
     keyMappings: KeyMapping[],
+    globalSearchTerm: string,
     searchTerm: string,
-    mode: string,
-    searchMode: string
+    mode: string
   ): KeyMapping[] => {
-    if (!searchTerm) {
-      return keyMappings;
-    }
-
-    const filteredMappings = keyMappings.filter((mapping) => {
-      if (mode && mapping.mode.toLowerCase() !== mode.toLowerCase()) {
+    return keyMappings.filter((mapping) => {
+      if (
+        mapping.mode !== mode ||
+        (globalSearchTerm &&
+          !mapping.key.toLowerCase().includes(globalSearchTerm.toLowerCase()) &&
+          !mapping.description
+            .toLowerCase()
+            .includes(globalSearchTerm.toLowerCase()))
+      ) {
         return false;
       }
 
-      if (searchMode === "hard-match") {
-        return (
-          mapping.key === searchTerm ||
-          mapping.key.toUpperCase() === searchTerm ||
-          mapping.key.toLowerCase() === searchTerm
-        );
-      }
-
       return (
-        mapping.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        mapping.description.toLowerCase().includes(searchTerm.toLowerCase())
+        mapping.key === searchTerm ||
+        mapping.key.toUpperCase() === searchTerm ||
+        mapping.key.toLowerCase() === searchTerm
       );
     });
-
-    return filteredMappings;
   };
 
-  const filteredMappings = filterKeyMappings(
-    keyMappings,
-    search,
-    mode,
-    searchMode
-  );
+  const filteredMappings = search
+    ? filterKeyMappings(keyMappings, globalSearch, search, mode)
+    : keyMappings.filter((mapping) =>
+        globalSearch
+          ? mapping.key.toLowerCase().includes(globalSearch.toLowerCase()) ||
+            mapping.description
+              .toLowerCase()
+              .includes(globalSearch.toLowerCase())
+          : mapping.mode === mode
+      );
 
   return (
     <Container>
@@ -136,6 +127,13 @@ export default function Home() {
       </Head>
 
       <Header>
+        <GlobalSearchInput
+          id="search"
+          type="text"
+          value={globalSearch}
+          onChange={handleGlobalSearchChange}
+          placeholder="Global search..."
+        />
         <IconLink
           href="https://github.com/force10269/vim-dictionary"
           target="_blank"
@@ -170,7 +168,6 @@ export default function Home() {
             style={{ flexGrow: 1 }}
           />
           <ClearButton onClick={handleClearButtonClick}>Clear</ClearButton>
-          <ClearButton onClick={handleSearchButtonClick}>Search</ClearButton>
         </SearchRow>
         {filteredMappings.length > 0 ? (
           <KeyMappingsTable>
