@@ -1,5 +1,7 @@
 # Vim Dictionary
 
+![Vim dictionary page](https://raw.githubusercontent.com/force10269/vim-dictionary/main/assets/vim-dictionary.png)
+
 Vim Dictionary is a web application that provides a quick and easy way to search and learn Vim keybindings. The application offers a terminal-like interface, allowing users to search for keybindings based on their Vim mode (Normal, Visual, Insert, etc.). Users can also log in to add, remove, or modify keybindings in their custom dictionary.
 
 ## Table of Contents
