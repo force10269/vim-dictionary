@@ -14,6 +14,13 @@ import {
   ClearButton,
   SearchRow,
 } from "../styles/index.module";
+import { keyMappings } from "@/data/default-dictionary";
+
+interface KeyMapping {
+  key: string;
+  mode: string;
+  description: string;
+}
 
 export default function Home() {
   const [search, setSearch] = useState("");
@@ -63,6 +70,30 @@ export default function Home() {
     setSearch((prevSearch) => prevSearch + expressiveKey);
   };
 
+  const filterKeyMappings = (
+    keyMappings: KeyMapping[],
+    searchTerm: string,
+    mode: string
+  ): KeyMapping[] => {
+    if (!searchTerm) {
+      return keyMappings;
+    }
+
+    const filteredMappings = keyMappings.filter((mapping) => {
+      if (mode && mapping.mode.toLowerCase() !== mode.toLowerCase()) {
+        return false;
+      }
+      return (
+        mapping.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        mapping.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+
+    return filteredMappings;
+  };
+
+  const filteredMappings = filterKeyMappings(keyMappings, search, mode);
+
   return (
     <Container>
       <Head>
@@ -106,6 +137,13 @@ export default function Home() {
           />
           <ClearButton onClick={handleClearButtonClick}>Clear</ClearButton>
         </SearchRow>
+        {filteredMappings.map((mapping: KeyMapping) => (
+          <div key={`${mapping.key}-${mapping.mode}`}>
+            <span>{mapping.key}</span>
+            <span>{mapping.mode}</span>
+            <span>{mapping.description}</span>
+          </div>
+        ))}
       </Terminal>
     </Container>
   );
