@@ -27,6 +27,7 @@ export const SearchRow = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
+  margin-bottom: 15px;
 `;
 
 export const IconLink = styled.a`
@@ -81,4 +82,23 @@ export const ClearButton = styled.button`
   font-size: 1.2rem;
   padding: 0.5rem;
   margin-left: 0.5rem;
+`;
+
+export const KeyMappingsTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+`;
+
+export const KeyMappingsHeaderRow = styled.tr`
+  font-weight: bold;
+  text-align: left;
+`;
+
+export const KeyMappingsRow = styled.tr`
+  padding: 8px;
+  border-bottom: 1px solid #f3f3f3;
+`;
+
+export const TableCell = styled.td`
+  padding: 8px;
 `;

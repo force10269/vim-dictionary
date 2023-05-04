@@ -13,6 +13,10 @@ import {
   ModeSelect,
   ClearButton,
   SearchRow,
+  KeyMappingsRow,
+  KeyMappingsTable,
+  KeyMappingsHeaderRow,
+  TableCell,
 } from "../styles/index.module";
 import { keyMappings } from "@/data/default-dictionary";
 
@@ -166,13 +170,22 @@ export default function Home() {
           <ClearButton onClick={handleClearButtonClick}>Clear</ClearButton>
           <ClearButton onClick={handleSearchButtonClick}>Search</ClearButton>
         </SearchRow>
-        {filteredMappings.map((mapping: KeyMapping) => (
-          <div key={`${mapping.key}-${mapping.mode}`}>
-            <span>{mapping.key}</span>
-            &nbsp;
-            <span>{mapping.description}</span>
-          </div>
-        ))}
+        <KeyMappingsTable>
+          <thead>
+            <KeyMappingsHeaderRow>
+              <TableCell>Key</TableCell>
+              <TableCell>Description</TableCell>
+            </KeyMappingsHeaderRow>
+          </thead>
+          <tbody>
+            {filteredMappings.map((mapping: KeyMapping) => (
+              <KeyMappingsRow key={`${mapping.key}-${mapping.mode}`}>
+                <TableCell>{mapping.key}</TableCell>
+                <TableCell>{mapping.description}</TableCell>
+              </KeyMappingsRow>
+            ))}
+          </tbody>
+        </KeyMappingsTable>
       </Terminal>
     </Container>
   );
