@@ -24,10 +24,15 @@ interface KeyMapping {
 
 export default function Home() {
   const [search, setSearch] = useState("");
+  const [searchBtnInput, setSearchBtnInput] = useState("");
   const [mode, setMode] = useState("normal");
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+  };
+
+  const handleSearchButtonClick = () => {
+    setSearchBtnInput(search);
   };
 
   const handleModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -73,9 +78,10 @@ export default function Home() {
   const filterKeyMappings = (
     keyMappings: KeyMapping[],
     searchTerm: string,
-    mode: string
+    mode: string,
+    searchBtnTerm: string
   ): KeyMapping[] => {
-    if (!searchTerm) {
+    if (!searchTerm && !searchBtnTerm) {
       return keyMappings;
     }
 
@@ -83,6 +89,15 @@ export default function Home() {
       if (mode && mapping.mode.toLowerCase() !== mode.toLowerCase()) {
         return false;
       }
+
+      if (searchBtnTerm) {
+        return (
+          mapping.key === searchBtnTerm ||
+          mapping.key.toUpperCase() === searchBtnTerm ||
+          mapping.key.toLowerCase() === searchBtnTerm
+        );
+      }
+
       return (
         mapping.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
         mapping.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -92,7 +107,12 @@ export default function Home() {
     return filteredMappings;
   };
 
-  const filteredMappings = filterKeyMappings(keyMappings, search, mode);
+  const filteredMappings = filterKeyMappings(
+    keyMappings,
+    search,
+    mode,
+    searchBtnInput
+  );
 
   return (
     <Container>
@@ -136,6 +156,7 @@ export default function Home() {
             style={{ flexGrow: 1 }}
           />
           <ClearButton onClick={handleClearButtonClick}>Clear</ClearButton>
+          <ClearButton onClick={handleSearchButtonClick}>Search</ClearButton>
         </SearchRow>
         {filteredMappings.map((mapping: KeyMapping) => (
           <div key={`${mapping.key}-${mapping.mode}`}>
