@@ -41,4 +41,73 @@ export const keyMappings = [
   },
   { key: "v", mode: "normal", description: "Enter visual mode" },
   { key: ":", mode: "normal", description: "Enter command-line mode" },
+  {
+    key: "x",
+    mode: "normal",
+    description: "Delete the character under the cursor",
+  },
+  {
+    key: "X",
+    mode: "normal",
+    description: "Delete the character before the cursor",
+  },
+  {
+    key: "f<char>",
+    mode: "normal",
+    description:
+      "Move the cursor to the next occurrence of <char> on the current line",
+  },
+  {
+    key: "F<char>",
+    mode: "normal",
+    description:
+      "Move the cursor to the previous occurrence of <char> on the current line",
+  },
+  { key: "/", mode: "normal", description: "Search forward for a pattern" },
+  { key: "?", mode: "normal", description: "Search backward for a pattern" },
+  { key: "n", mode: "normal", description: "Move to the next search result" },
+  {
+    key: "N",
+    mode: "normal",
+    description: "Move to the previous search result",
+  },
+  {
+    key: "%",
+    mode: "normal",
+    description: "Jump to the matching bracket, brace, or parentheses",
+  },
+  {
+    key: "r<char>",
+    mode: "normal",
+    description: "Replace the character under the cursor with <char>",
+  },
+  {
+    key: "J",
+    mode: "normal",
+    description: "Join the current line with the next line",
+  },
+  { key: ":", mode: "command-line", description: "Execute a command" },
+  { key: "<Esc>", mode: "insert", description: "Return to normal mode" },
+  { key: "<Ctrl>f", mode: "normal", description: "Page forward" },
+  { key: "<Ctrl>b", mode: "normal", description: "Page backward" },
+  { key: "<Ctrl>d", mode: "normal", description: "Scroll down" },
+  { key: "<Ctrl>u", mode: "normal", description: "Scroll up" },
+  {
+    key: "gg",
+    mode: "normal",
+    description: "Go to the first line of the file",
+  },
+  { key: "G", mode: "normal", description: "Go to the last line of the file" },
+  { key: "w", mode: "visual", description: "Select the next word" },
+  { key: "b", mode: "visual", description: "Select the previous word" },
+  {
+    key: "e",
+    mode: "visual",
+    description: "Select to the end of the current word",
+  },
+  { key: "y", mode: "visual", description: "Copy the selected text" },
+  { key: "d", mode: "visual", description: "Delete the selected text" },
+  { key: "<", mode: "visual", description: "Shift the selected text left" },
+  { key: ">", mode: "visual", description: "Shift the selected text right" },
+  { key: "=", mode: "visual", description: "Indent the selected text" },
 ];

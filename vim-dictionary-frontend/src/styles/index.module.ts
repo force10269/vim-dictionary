@@ -40,7 +40,7 @@ export const GlobalSearchInput = styled.input`
   font-family: "Courier New", Courier, monospace;
   font-size: 1.2rem;
   padding: 0.5rem;
-  width: 30%;
+  width: 40%;
 `;
 
 export const SearchRow = styled.div`
