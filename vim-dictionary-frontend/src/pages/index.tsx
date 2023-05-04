@@ -58,6 +58,11 @@ export default function Home() {
   };
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearchButtonClick();
+      return;
+    }
+
     e.preventDefault();
     if (e.key === "Backspace") {
       setSearch((prevSearch) => prevSearch.slice(0, -1));
