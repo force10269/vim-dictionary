@@ -5,6 +5,7 @@ import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 import {
+  Title,
   Container,
   Header,
   IconLink,
@@ -146,6 +147,7 @@ export default function Home() {
         </IconLink>
       </Header>
 
+      <Title>Vim Dictionary</Title>
       <Terminal>
         <label htmlFor="mode">Mode:</label>
         <ModeSelect id="mode" value={mode} onChange={handleModeChange}>

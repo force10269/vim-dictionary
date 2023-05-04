@@ -1,5 +1,14 @@
 import styled from "styled-components";
 
+export const Title = styled.h1`
+  text-align: center;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #f8f8f2;
+  margin-top: 1.5rem;
+`;
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
