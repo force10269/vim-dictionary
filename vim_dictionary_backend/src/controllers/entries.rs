@@ -1,6 +1,6 @@
 use crate::models::Entry;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
-use sqlx::PgPool;
+use sqlx::{PgPool, Row};
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_all_entries);
@@ -11,22 +11,24 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/entries")]
-asynd fn get_all_entries(pool: web::Data<PgPool>) -> impl Responder {
+async fn get_all_entries(pool: web::Data<PgPool>) -> impl Responder {
     let entries = sqlx::query_as::<_, Entry>("SELECT * FROM entries")
-        .fetch_all(&*pool)
+        .fetch_all(&**pool)
         .await
         .unwrap();
+
+    HttpResponse::Ok().json(entries)
 }
 
 #[get("/entries/{id}")]
 async fn get_entry(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responder {
     let entry = sqlx::query_as::<_, Entry>("SELECT * FROM entries WHERE id = $1")
         .bind(&id.into_inner())
-        .fetch_one(&*pool)
+        .fetch_one(&**pool)
         .await;
     
     match entry {
-        Ok(dictionary) => HttpResponse::Ok().json(entry),
+        Ok(entry) => HttpResponse::Ok().json(entry),
         Err(_) => HttpResponse::NotFound().finish(),
     }
 }
@@ -43,7 +45,7 @@ async fn create_entry(
     .bind(&entry.description)
     .bind(&entry.mode)
     .bind(&entry.section_id)
-    .fetch_one(&*pool)
+    .fetch_one(&**pool)
     .await;
 
     match result {
@@ -62,7 +64,7 @@ async fn create_entry(
 }
 
 #[put("/entries/{id}")]
-asynd fn update_entry(
+async fn update_entry(
     pool: web::Data<PgPool>,
     id: web::Path<i32>,
     entry: web::Json<Entry>,
@@ -75,7 +77,7 @@ asynd fn update_entry(
     .bind(&entry.mode)
     .bind(&entry.section_id)
     .bind(&id.into_inner())
-    .fetch_one(&*pool)
+    .fetch_one(&**pool)
     .await;
 
     match result {
@@ -97,7 +99,7 @@ asynd fn update_entry(
 async fn delete_entry(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responder {
     let result = sqlx::query("DELETE FROM entries where id = $1") 
         .bind(&id.into_inner())
-        .execute(&*pool)
+        .execute(&**pool)
         .await;
 
     match result {

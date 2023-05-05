@@ -2,21 +2,27 @@ use actix_cors::Cors;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
-use std::env;
+use env_logger;
+use std;
 
 use config::Config;
 
 mod config;
 mod models;
+mod controllers;
+
+use crate::controllers::{dictionaries, entries, sections, users};
 
 type DbPool = sqlx::PgPool;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", "debug");
+    env_logger::init();
     dotenv().ok();
     let conf = Config::new();
 
-    let mut db_pool_options = PgPoolOptions::new()
+    let db_pool_options = PgPoolOptions::new()
         .min_connections(conf.db_pool_min)
         .max_connections(conf.db_pool_max);
 
@@ -33,7 +39,12 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(db_pool.clone()))
             .service(
                 web::scope("/api")
-                    .configure(models::router)
+                    .configure(|cfg| {
+                        dictionaries::init_routes(cfg);
+                        entries::init_routes(cfg);
+                        sections::init_routes(cfg);
+                        users::init_routes(cfg);
+                    })
                     .wrap(Cors::permissive().max_age(3600)),
             )
             .route("/health", web::get().to(health_handler))

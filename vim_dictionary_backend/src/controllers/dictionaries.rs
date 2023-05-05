@@ -1,6 +1,6 @@
 use crate::models::Dictionary;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
-use sqlx::PgPool;
+use sqlx::{PgPool, Row}; 
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_all_dictionaries);
@@ -13,7 +13,7 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
 #[get("/dictionaries")]
 async fn get_all_dictionaries(pool: web::Data<PgPool>) -> impl Responder {
     let dictionaries = sqlx::query_as::<_, Dictionary>("SELECT * FROM dictionaries")
-        .fetch_all(&*pool)
+        .fetch_all(&**pool) 
         .await
         .unwrap();
 
@@ -24,7 +24,7 @@ async fn get_all_dictionaries(pool: web::Data<PgPool>) -> impl Responder {
 async fn get_dictionary(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responder {
     let dictionary = sqlx::query_as::<_, Dictionary>("SELECT * FROM dictionaries WHERE id = $1")
         .bind(&id.into_inner())
-        .fetch_one(&*pool)
+        .fetch_one(&**pool) 
         .await;
 
     match dictionary {
@@ -43,7 +43,7 @@ async fn create_dictionary(
     )
     .bind(&dictionary.name)
     .bind(&dictionary.user_id)
-    .fetch_one(&*pool)
+    .fetch_one(&**pool) 
     .await;
 
     match result {
@@ -71,7 +71,7 @@ async fn update_dictionary(
     .bind(&dictionary.name)
     .bind(&dictionary.user_id)
     .bind(&id.into_inner())
-    .fetch_one(&*pool)
+    .fetch_one(&**pool) 
     .await;
 
     match result {
@@ -91,11 +91,12 @@ async fn update_dictionary(
 async fn delete_dictionary(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responder {
     let result = sqlx::query("DELETE FROM dictionaries WHERE id = $1")
         .bind(&id.into_inner())
-        .execute(&*pool)
+        .execute(&**pool) 
         .await;
 
     match result {
         Ok(_) => HttpResponse::NoContent().finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(_) => HttpResponse::InternalServerError().finish()
     }
 }
+
