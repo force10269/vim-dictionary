@@ -82,47 +82,52 @@ export default function Home() {
 
   const filterKeyMappings = (
     keyMappings: KeyMapping[],
-    globalSearchTerm: string,
     searchTerm: string,
     mode: string
   ) => {
-    const searchChars = searchTerm.toLowerCase().split("");
-    const globalSearchTermLower = globalSearchTerm.toLowerCase();
-
     return keyMappings.filter((mapping) => {
-      const keyLower = mapping.key.toLowerCase();
-      const descriptionLower = mapping.description.toLowerCase();
-
-      const isModeMatch = mapping.mode === mode;
-      const isGlobalSearchMatch =
-        globalSearchTerm === "" ||
-        keyLower.includes(globalSearchTermLower) ||
-        descriptionLower.includes(globalSearchTermLower);
-
-      if (!isModeMatch || !isGlobalSearchMatch) {
+      if (!(mapping.mode === mode)) {
         return false;
       }
-
-      for (let i = 0; i < searchChars.length; i++) {
-        if (searchChars[i] !== keyLower[i]) {
-          return false;
-        }
+      if (
+        searchTerm &&
+        !mapping.key.toLowerCase().startsWith(searchTerm.toLowerCase())
+      ) {
+        return false;
       }
 
       return true;
     });
   };
 
-  const filteredMappings = search
-    ? filterKeyMappings(keyMappings, globalSearch, search, mode)
-    : keyMappings.filter((mapping) =>
-        globalSearch
-          ? mapping.key.toLowerCase().includes(globalSearch.toLowerCase()) ||
-            mapping.description
-              .toLowerCase()
-              .includes(globalSearch.toLowerCase())
-          : mapping.mode === mode
-      );
+  const filterGlobalSearch = (
+    keyMappings: KeyMapping[],
+    globalSearch: string
+  ) => {
+    return keyMappings.filter((mapping) => {
+      if (
+        globalSearch &&
+        !mapping.description.toLowerCase().includes(globalSearch.toLowerCase())
+      ) {
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const filteredMappings = (() => {
+    let result = keyMappings;
+
+    if (search) {
+      result = filterKeyMappings(result, search, mode);
+    }
+
+    if (globalSearch) {
+      result = filterGlobalSearch(result, globalSearch);
+    }
+
+    return result;
+  })();
 
   return (
     <Container>
