@@ -88,7 +88,6 @@ export const keyMappings = [
   },
   { key: ":", mode: "command-line", description: "Execute a command" },
   { key: "<Esc>", mode: "insert", description: "Return to normal mode" },
-  { key: "<Ctrl>f", mode: "normal", description: "Page forward" },
   { key: "<Ctrl>b", mode: "normal", description: "Page backward" },
   { key: "<Ctrl>d", mode: "normal", description: "Scroll down" },
   { key: "<Ctrl>u", mode: "normal", description: "Scroll up" },
@@ -110,4 +109,19 @@ export const keyMappings = [
   { key: "<", mode: "visual", description: "Shift the selected text left" },
   { key: ">", mode: "visual", description: "Shift the selected text right" },
   { key: "=", mode: "visual", description: "Indent the selected text" },
+  {
+    key: "r",
+    mode: "normal",
+    description: "Replace the character under the cursor",
+  },
+  { key: "cw", mode: "normal", description: "Change the current word" },
+  {
+    key: "c0",
+    mode: "normal",
+    description: "Change to the beginning of the line",
+  },
+  { key: "c$", mode: "normal", description: "Change to the end of the line" },
+  { key: "P", mode: "normal", description: "Paste before the cursor" },
+  { key: ">>", mode: "normal", description: "Indent the current line" },
+  { key: "<<", mode: "normal", description: "Unindent the current line" },
 ];

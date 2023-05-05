@@ -17,8 +17,8 @@ async fn main() -> std::io::Result<()> {
     let conf = Config::new();
 
     let mut db_pool_options = PgPoolOptions::new()
-    .min_connections(conf.db_pool_min)
-    .max_connections(conf.db_pool_max);
+        .min_connections(conf.db_pool_min)
+        .max_connections(conf.db_pool_max);
 
     let db_pool = db_pool_options
         .connect(&conf.db_url)
