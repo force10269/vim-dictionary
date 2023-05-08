@@ -13,8 +13,6 @@ mod controllers;
 
 use crate::controllers::{dictionaries, entries, sections, users};
 
-type DbPool = sqlx::PgPool;
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "debug");

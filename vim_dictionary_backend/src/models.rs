@@ -1,5 +1,4 @@
 use sqlx::FromRow;
-use actix_web::{HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -32,8 +31,3 @@ pub struct User {
     pub password_hash: String,
     pub email: String,
 }
-
-async fn api_handler() -> impl Responder {
-    HttpResponse::Ok().body("API is running")
-}
-
