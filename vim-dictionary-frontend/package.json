@@ -30,6 +30,11 @@
   },
   "devDependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.4.0",
-    "@types/styled-components": "^5.1.26"
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/jest": "^29.5.1",
+    "@types/styled-components": "^5.1.26",
+    "jest": "^29.5.0"
   }
 }
