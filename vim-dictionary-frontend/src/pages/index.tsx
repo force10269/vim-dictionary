@@ -37,7 +37,10 @@ export default function Home() {
   };
 
   const handleGlobalSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setGlobalSearch(e.target.value);
+    const newValue = e.target.value;
+    if (newValue !== globalSearch) {
+      setGlobalSearch(newValue);
+    }
   };
 
   const handleModeChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -139,11 +142,12 @@ export default function Home() {
 
       <Header>
         <GlobalSearchInput
-          id="search"
+          id="global-search"
           type="text"
           value={globalSearch}
           onChange={handleGlobalSearchChange}
           placeholder="Global search..."
+          aria-label="Global search"
         />
         <IconLink
           href="https://github.com/force10269/vim-dictionary"

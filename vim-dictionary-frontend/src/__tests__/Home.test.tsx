@@ -22,15 +22,14 @@ describe("Home", () => {
   test("renders search input and types a key", () => {
     const searchInput = screen.getByPlaceholderText("Type keymap (e.g. dd)");
     expect(searchInput).toBeInTheDocument();
-    userEvent.type(searchInput, "a");
+    fireEvent.keyDown(searchInput, { key: "a" });
     expect(searchInput).toHaveValue("a");
   });
 
   test("renders global search input and types a search term", () => {
     const globalSearchInput = screen.getByPlaceholderText("Global search...");
     expect(globalSearchInput).toBeInTheDocument();
-    userEvent.type(globalSearchInput, "delete");
+    fireEvent.change(globalSearchInput, { target: { value: "delete" } });
     expect(globalSearchInput).toHaveValue("delete");
   });
 });
-
