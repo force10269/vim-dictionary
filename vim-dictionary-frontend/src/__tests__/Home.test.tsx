@@ -1,5 +1,4 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import Home from "../pages/index";
 
 describe("Home", () => {
