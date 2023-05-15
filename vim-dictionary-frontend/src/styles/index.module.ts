@@ -191,7 +191,8 @@ export const ModalContent = styled.div`
 
 export const ModalActions = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   width: 100%;
 `;
 
@@ -199,6 +200,7 @@ export const Button = styled(BootstrapButton)`
   font-family: "Courier New", Courier, monospace;
   font-size: 1.2rem;
   padding: 0.5rem 1rem;
+  margin: 0.5rem 1rem;
   border-radius: 5px;
   color: #f8f8f2;
   background-color: ${(props) => (props.primary ? "#44475a" : "transparent")};
