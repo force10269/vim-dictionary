@@ -70,8 +70,10 @@ export const SearchRow = styled.div`
 
 export const IconLink = styled.a`
   color: #f8f8f2;
-  margin-left: 1rem;
   font-size: 1.5rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 0.5rem;
 `;
 
 export const Terminal = styled.div`

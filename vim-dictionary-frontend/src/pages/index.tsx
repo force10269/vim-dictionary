@@ -161,6 +161,12 @@ export default function Home() {
       </Head>
 
       <Header>
+        <IconLink
+          href="https://github.com/force10269/vim-dictionary"
+          target="_blank"
+        >
+          <FontAwesomeIcon icon={faGithub} size={"2x"} />
+        </IconLink>
         <GlobalSearchInput
           id="global-search"
           type="text"
@@ -169,12 +175,6 @@ export default function Home() {
           placeholder="Global search..."
           aria-label="Global search"
         />
-        <IconLink
-          href="https://github.com/force10269/vim-dictionary"
-          target="_blank"
-        >
-          <FontAwesomeIcon icon={faGithub} size={"2x"} />
-        </IconLink>
         {!loggedIn && (
           <>
             <AuthButton onClick={() => setLoginModalVisible(true)}>
