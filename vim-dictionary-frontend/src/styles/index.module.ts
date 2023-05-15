@@ -7,7 +7,7 @@ export const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: bold;
   color: #f8f8f2;
-  margin-top: 1.5rem;
+  margin-top: 4rem;
 `;
 
 export const Container = styled.div`
@@ -201,12 +201,12 @@ export const Button = styled(BootstrapButton)`
   padding: 0.5rem 1rem;
   border-radius: 5px;
   color: #f8f8f2;
-  background-color: ${props => props.primary ? "#44475a" : "transparent"};
+  background-color: ${(props) => (props.primary ? "#44475a" : "transparent")};
   border: 1px solid #f8f8f2;
 
   &:hover {
     color: #f8f8f2;
-    background-color: ${props => props.primary ? "#44475a" : "transparent"};
+    background-color: ${(props) => (props.primary ? "#44475a" : "transparent")};
     opacity: 0.8;
   }
 `;
