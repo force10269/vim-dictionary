@@ -16,4 +16,6 @@ tokio = { version = "1", features = ["full"] }
 jsonwebtoken = "8.0.1"
 bcrypt = "0.10.1"
 uuid = { version = "0.8", features = ["serde", "v4"] }
+log = "0.4"
 env_logger = "0.9"
+chrono = "0.4"

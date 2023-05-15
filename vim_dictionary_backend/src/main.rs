@@ -15,8 +15,9 @@ use crate::controllers::{dictionaries, entries, sections, users};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "debug");
-    env_logger::init();
+    env_logger::Builder::new()
+        .filter(None, log::LevelFilter::Info)
+        .init();
     dotenv().ok();
     let conf = Config::new();
 

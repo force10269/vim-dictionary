@@ -45,3 +45,28 @@ export async function logoutUser() {
     }
   }
 }
+
+export async function validateToken(): Promise<boolean> {
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/api/validate_token`,
+      null,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.status === 200;
+  } catch (error) {
+    console.error("Failed to validate:", error);
+    return false;
+  }
+}

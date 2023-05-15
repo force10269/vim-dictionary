@@ -69,14 +69,14 @@ const LoginModal: React.FC<LoginModalProps> = ({
           <label htmlFor="username">Username</label>
           <input
             type="text"
-            id="username"
+            id="login_username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <label htmlFor="password">Password</label>
           <input
             type="password"
-            id="password"
+            id="login_password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

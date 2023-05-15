@@ -1,11 +1,12 @@
 use crate::models::User;
 use actix_identity::Identity;
-use actix_web::{get, post, delete, web, HttpResponse, Responder};
+use actix_web::{get, post, delete, web, HttpResponse, HttpRequest, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
-use jsonwebtoken::{encode, EncodingKey, Header};
+use jsonwebtoken::{encode, decode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::env;
+use log::info;
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(register);
@@ -14,6 +15,7 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_all_users);
     cfg.service(get_user);
     cfg.service(delete_user);
+    cfg.service(validate_token);
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -71,9 +73,10 @@ async fn login(
                 let secret_key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
                 let key = EncodingKey::from_secret(secret_key.as_ref());
                 let expiration = 24 * 3600; // 24 hours
+                let now = chrono::Utc::now().timestamp() as usize;
                 let claims = Claims {
                     sub: user.username,
-                    exp: expiration,
+                    exp: now + expiration,
                 };
                 let token = encode(&Header::default(), &claims, &key).unwrap();
 
@@ -91,6 +94,42 @@ async fn login(
 async fn logout(identity: Identity) -> impl Responder {
     identity.forget();
     HttpResponse::Ok().finish()
+}
+
+#[post("/validate_token")]
+async fn validate_token(req: HttpRequest) -> impl Responder {
+    match req.headers().get("Authorization") {
+        Some(token_header) => {
+            if let Ok(token) = token_header.to_str() {
+                if token.starts_with("Bearer ") {
+                    let token = &token[7..];
+                    let secret_key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+                    let decoding_key = DecodingKey::from_secret(secret_key.as_ref());
+                    let validation = Validation::default();
+
+                    match decode::<Claims>(&token, &decoding_key, &validation) {
+                        Ok(_) => {
+                            HttpResponse::Ok().finish()
+                        }
+                        Err(e) => {
+                            info!("Failed to decode token: {:?}", e);
+                            HttpResponse::Unauthorized().finish()
+                        }
+                    }
+                } else {
+                    info!("Malformed Authorization header");
+                    HttpResponse::BadRequest().finish()
+                }
+            } else {
+                info!("Failed to convert Authorization header to string");
+                HttpResponse::BadRequest().finish()
+            }
+        }
+        None => {
+            info!("No token received");
+            HttpResponse::Unauthorized().finish()
+        }
+    }
 }
 
 #[get("/users")]

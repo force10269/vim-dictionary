@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Modal from "./Modal";
 import styles from "@/styles/Modal.module.css";
 import { registerUser } from "../services/userService";
 
@@ -73,21 +72,21 @@ const SignupModal: React.FC<SignupModalProps> = ({
           <label htmlFor="username">Username</label>
           <input
             type="text"
-            id="username"
+            id="sign_up_username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <label htmlFor="email">Email</label>
           <input
             type="email"
-            id="email"
+            id="sign_up_email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <label htmlFor="password">Password</label>
           <input
             type="password"
-            id="password"
+            id="sign_up_password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

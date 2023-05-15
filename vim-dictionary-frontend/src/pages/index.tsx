@@ -23,6 +23,7 @@ import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import LogoutModal from "@/components/LogoutModal";
 import { keyMappings } from "@/data/default-dictionary";
+import { validateToken } from "@/services/userService";
 
 interface KeyMapping {
   key: string;
@@ -40,10 +41,15 @@ export default function Home() {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-    if (token) {
-      setLoggedIn(true);
-    }
+    const checkToken = async () => {
+      const isValid = await validateToken();
+      if (isValid) {
+        setLoggedIn(true);
+      } else {
+        sessionStorage.removeItem("token");
+      }
+    };
+    checkToken();
   }, []);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
