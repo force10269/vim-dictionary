@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LoadingOverlay from "./LoadingOverlay";
 import styles from "@/styles/Modal.module.css";
 import { loginUser } from "../services/userService";
 
@@ -21,9 +22,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     try {
       const loginData: LoginData = {
         username: username,
@@ -40,6 +43,8 @@ const LoginModal: React.FC<LoginModalProps> = ({
       onClose();
     } catch (error) {
       setErrorMessage("Some error happened");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,40 +54,44 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
   return (
     <div className={styles.modal} style={{ display: show ? "flex" : "none" }}>
-      <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={onClose}>
-          &times;
-        </button>
-        <h2 className={styles.modalHeader}>Login</h2>
-        {errorMessage && (
-          <div className={styles.errorMessage}>
-            <span>{errorMessage}</span>
-            <button
-              className={styles.errorCloseButton}
-              onClick={clearErrorMessage}
-            >
-              &times;
-            </button>
-          </div>
-        )}
-        <form className={styles.modalForm} onSubmit={handleSubmit}>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="login_username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="login_password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button type="submit">Login</button>
-        </form>
-      </div>
+      {loading ? (
+        <LoadingOverlay message="Processing..." />
+      ) : (
+        <div className={styles.modalContent}>
+          <button className={styles.closeButton} onClick={onClose}>
+            &times;
+          </button>
+          <h2 className={styles.modalHeader}>Login</h2>
+          {errorMessage && (
+            <div className={styles.errorMessage}>
+              <span>{errorMessage}</span>
+              <button
+                className={styles.errorCloseButton}
+                onClick={clearErrorMessage}
+              >
+                &times;
+              </button>
+            </div>
+          )}
+          <form className={styles.modalForm} onSubmit={handleSubmit}>
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="login_username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="login_password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit">Login</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
