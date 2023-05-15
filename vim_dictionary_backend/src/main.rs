@@ -43,7 +43,13 @@ async fn main() -> std::io::Result<()> {
                         sections::init_routes(cfg);
                         users::init_routes(cfg);
                     })
-                    .wrap(Cors::permissive().max_age(3600)),
+                    .wrap(
+                        Cors::default()
+                            .allow_any_origin()
+                            .allow_any_method()
+                            .allow_any_header()
+                            .max_age(3600),
+                    ),
             )
             .route("/health", web::get().to(health_handler))
             .default_service(web::route().to(HttpResponse::NotFound))

@@ -7,6 +7,7 @@ import {
   Title,
   Container,
   Header,
+  AuthButton,
   GlobalSearchInput,
   IconLink,
   Terminal,
@@ -19,7 +20,11 @@ import {
   KeyMappingsHeaderRow,
   TableCell,
 } from "../styles/index.module";
+import LoginModal from "@/components/LoginModal";
+import SignupModal from "@/components/SignupModal";
+import LogoutModal from "@/components/LogoutModal";
 import { keyMappings } from "@/data/default-dictionary";
+import axios from "axios";
 
 interface KeyMapping {
   key: string;
@@ -31,6 +36,29 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [globalSearch, setGlobalSearch] = useState("");
   const [mode, setMode] = useState("normal");
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  // Modal state management
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [signupModalVisible, setSignupModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/logout`
+      );
+
+      if (response.status === 200) {
+        setLoggedIn(false);
+      } else {
+        // handle error
+      }
+    } catch (error) {
+      // handle error
+    }
+  };
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -153,11 +181,49 @@ export default function Home() {
           href="https://github.com/force10269/vim-dictionary"
           target="_blank"
         >
-          <FontAwesomeIcon icon={faGithub} size={"sm"} />
+          <FontAwesomeIcon icon={faGithub} size={"2x"} />
         </IconLink>
-        <IconLink href="#">
-          <FontAwesomeIcon icon={faUser} size={"sm"} />
-        </IconLink>
+        {!loggedIn && (
+          <>
+            <AuthButton onClick={() => setLoginModalVisible(true)}>
+              Log In
+            </AuthButton>
+            <AuthButton onClick={() => setSignupModalVisible(true)}>
+              Sign Up
+            </AuthButton>
+            <LoginModal
+              show={loginModalVisible}
+              onClose={() => setLoginModalVisible(false)}
+              onLoginSuccess={() => {
+                setLoggedIn(true);
+                setLoginModalVisible(false);
+              }}
+            />
+            <SignupModal
+              show={signupModalVisible}
+              onClose={() => setSignupModalVisible(false)}
+              onSignupSuccess={() => {
+                setLoggedIn(true);
+                setSignupModalVisible(false);
+              }}
+            />
+          </>
+        )}
+        {loggedIn && (
+          <>
+            <AuthButton onClick={() => setLogoutModalVisible(true)}>
+              Log Out
+            </AuthButton>
+            <LogoutModal
+              show={logoutModalVisible}
+              onClose={() => setLogoutModalVisible(false)}
+              onLogoutSuccess={() => {
+                setLoggedIn(false);
+                setLogoutModalVisible(false);
+              }}
+            />
+          </>
+        )}
       </Header>
 
       <Title>Vim Dictionary</Title>
