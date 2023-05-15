@@ -22,6 +22,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({
   const handleLogout = async () => {
     try {
       await logoutUser();
+      sessionStorage.removeItem("token");
       onLogoutSuccess();
     } catch (error) {
       console.error("Error logging out:", error);

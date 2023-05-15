@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useEffect } from "react";
 import Head from "next/head";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
@@ -23,7 +23,6 @@ import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import LogoutModal from "@/components/LogoutModal";
 import { keyMappings } from "@/data/default-dictionary";
-import axios from "axios";
 
 interface KeyMapping {
   key: string;
@@ -36,28 +35,16 @@ export default function Home() {
   const [globalSearch, setGlobalSearch] = useState("");
   const [mode, setMode] = useState("normal");
   const [loggedIn, setLoggedIn] = useState(false);
-
-  // Modal state management
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [signupModalVisible, setSignupModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleLogout = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/logout`
-      );
-
-      if (response.status === 200) {
-        setLoggedIn(false);
-      } else {
-        // handle error
-      }
-    } catch (error) {
-      // handle error
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      setLoggedIn(true);
     }
-  };
+  }, []);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

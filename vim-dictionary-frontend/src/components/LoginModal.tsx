@@ -22,19 +22,20 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       const loginData: LoginData = {
         username: username,
         password: password,
       };
-      const result = await loginUser(loginData);
-      if (!result) {
-        setErrorMessage(result.message);
+      const token = await loginUser(loginData);
+      if (!token) {
+        setErrorMessage(token.message);
         return;
       }
 
+      sessionStorage.setItem("token", token);
       onLoginSuccess();
       onClose();
     } catch (error) {
