@@ -9,7 +9,7 @@ interface DictionaryData {
 
 export async function createDictionary(data: DictionaryData) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/dictionaries`, data);
+    const response = await axios.post(`${API_BASE_URL}/api/dictionaries`, data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -20,7 +20,20 @@ export async function createDictionary(data: DictionaryData) {
 
 export async function getDictionary(id: number) {
   try {
-    const response = await axios.get(`${API_BASE_URL}/dictionaries/${id}`);
+    const response = await axios.get(`${API_BASE_URL}/api/dictionaries/${id}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw error.response.data;
+    }
+  }
+}
+
+export async function getDictionariesByUserId(user_id: number) {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/dictionaries/user/${user_id}`
+    );
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -32,7 +45,7 @@ export async function getDictionary(id: number) {
 export async function updateDictionary(data: DictionaryData, id: number) {
   try {
     const response = await axios.put(
-      `${API_BASE_URL}/dictionaries/${id}`,
+      `${API_BASE_URL}/api/dictionaries/${id}`,
       data
     );
     return response.data;
@@ -45,7 +58,9 @@ export async function updateDictionary(data: DictionaryData, id: number) {
 
 export async function deleteDictionary(id: number) {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/dictionaries/${id}`);
+    const response = await axios.delete(
+      `${API_BASE_URL}/api/dictionaries/${id}`
+    );
     return response.status === 204;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
