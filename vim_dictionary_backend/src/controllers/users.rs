@@ -1,4 +1,4 @@
-use crate::models::User;
+use crate::models::{Dictionary, Section, Entry, User};
 use actix_identity::Identity;
 use actix_web::{get, post, delete, web, HttpResponse, HttpRequest, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
@@ -10,6 +10,7 @@ use std::env;
 use log::info;
 
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(get_user_data);
     cfg.service(register);
     cfg.service(login);
     cfg.service(logout);
@@ -17,6 +18,13 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_user);
     cfg.service(delete_user);
     cfg.service(validate_token);
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UserData {
+    pub dictionaries: Vec<Dictionary>,
+    pub sections: Vec<Section>,
+    pub entries: Vec<Entry>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -36,6 +44,36 @@ pub struct LoginData {
 pub struct Claims {
     pub sub: String,
     pub exp: usize,
+}
+
+#[get("/user_data/{user_id}")]
+async fn get_user_data(pool: web::Data<PgPool>, user_id: web::Path<i32>) -> impl Responder {
+    let user_id = user_id.into_inner();
+    let dictionaries = sqlx::query_as::<_, Dictionary>("SELECT * FROM dictionaries WHERE user_id = $1")
+        .bind(&user_id)
+        .fetch_all(&**pool)
+        .await
+        .unwrap();
+
+    let sections = sqlx::query_as::<_, Section>("SELECT * FROM sections WHERE dictionary_id = $1")
+        .bind(&user_id)
+        .fetch_all(&**pool)
+        .await
+        .unwrap();
+
+    let entries = sqlx::query_as::<_, Entry>("SELECT * FROM entries WHERE section_id = $1")
+        .bind(&user_id)
+        .fetch_all(&**pool)
+        .await
+        .unwrap();
+
+    let user_data = UserData {
+        dictionaries,
+        sections,
+        entries,
+    };
+
+    HttpResponse::Ok().json(user_data)
 }
 
 #[post("/register")]
