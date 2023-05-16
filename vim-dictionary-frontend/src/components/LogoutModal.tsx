@@ -1,4 +1,5 @@
 import React from "react";
+import Cookies from "js-cookie";
 import Modal from "./Modal";
 import {
   ModalTitle,
@@ -22,7 +23,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({
   const handleLogout = async () => {
     try {
       await logoutUser();
-      sessionStorage.removeItem("token");
+      Cookies.remove("token");
       onLogoutSuccess();
     } catch (error) {
       console.error("Error logging out:", error);

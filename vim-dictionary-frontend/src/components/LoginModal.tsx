@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import LoadingOverlay from "./LoadingOverlay";
 import styles from "@/styles/Modal.module.css";
 import { loginUser } from "../services/userService";
@@ -38,7 +39,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
         return;
       }
 
-      sessionStorage.setItem("token", token);
+      Cookies.set("token", token);
       onLoginSuccess();
       onClose();
     } catch (error) {

@@ -48,7 +48,7 @@ export async function logoutUser() {
 }
 
 export async function validateToken(): Promise<boolean> {
-  const token = sessionStorage.getItem("token");
+  const token = Cookies.get("token");
 
   if (!token) {
     return false;

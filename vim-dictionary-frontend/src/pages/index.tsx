@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import Head from "next/head";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
@@ -46,7 +47,7 @@ export default function Home() {
       if (isValid) {
         setLoggedIn(true);
       } else {
-        sessionStorage.removeItem("token");
+        Cookies.remove("token");
       }
     };
     checkToken();
