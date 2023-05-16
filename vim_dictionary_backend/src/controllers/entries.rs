@@ -5,6 +5,7 @@ use sqlx::{PgPool, Row};
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_all_entries);
     cfg.service(get_entry);
+    cfg.service(get_entries_by_section_id);
     cfg.service(create_entry);
     cfg.service(update_entry);
     cfg.service(delete_entry);
@@ -29,6 +30,19 @@ async fn get_entry(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responde
     
     match entry {
         Ok(entry) => HttpResponse::Ok().json(entry),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
+}
+
+#[get("/entries/section/{section_id}")]
+async fn get_entries_by_section_id(pool: web::Data<PgPool>, section_id: web::Path<i32>) -> impl Responder {
+    let entries = sqlx::query_as::<_, Entry>("SELECT * FROM entries WHERE section_id = $1")
+        .bind(&section_id.into_inner())
+        .fetch_all(&**pool)
+        .await;
+
+    match entries {
+        Ok(entries) => HttpResponse::Ok().json(entries),
         Err(_) => HttpResponse::NotFound().finish(),
     }
 }

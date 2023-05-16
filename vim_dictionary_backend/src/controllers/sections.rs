@@ -5,6 +5,7 @@ use sqlx::{PgPool, Row};
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_all_sections);
     cfg.service(get_section);
+    cfg.service(get_sections_by_dictionary_id);
     cfg.service(create_section);
     cfg.service(update_section);
     cfg.service(delete_section);
@@ -28,6 +29,19 @@ async fn get_section(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Respon
 
     match section {
         Ok(section) => HttpResponse::Ok().json(section),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
+}
+
+#[get("/sections/dictionary/{dictionary_id}")]
+async fn get_sections_by_dictionary_id(pool: web::Data<PgPool>, dictionary_id: web::Path<i32>) -> impl Responder {
+    let sections = sqlx::query_as::<_, Section>("SELECT * FROM sections WHERE dictionary_id = $1")
+        .bind(&dictionary_id.into_inner())
+        .fetch_all(&**pool)
+        .await;
+
+    match sections {
+        Ok(sections) => HttpResponse::Ok().json(sections),
         Err(_) => HttpResponse::NotFound().finish(),
     }
 }

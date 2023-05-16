@@ -5,6 +5,7 @@ use sqlx::{PgPool, Row};
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_all_dictionaries);
     cfg.service(get_dictionary);
+    cfg.service(get_dictionaries_by_user_id);
     cfg.service(create_dictionary);
     cfg.service(update_dictionary);
     cfg.service(delete_dictionary);
@@ -29,6 +30,19 @@ async fn get_dictionary(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Res
 
     match dictionary {
         Ok(dictionary) => HttpResponse::Ok().json(dictionary),
+        Err(_) => HttpResponse::NotFound().finish(),
+    }
+}
+
+#[get("/dictionaries/user/{user_id}")]
+async fn get_dictionaries_by_user_id(pool: web::Data<PgPool>, user_id: web::Path<i32>) -> impl Responder {
+    let dictionaries = sqlx::query_as::<_, Dictionary>("SELECT * FROM dictionaries WHERE user_id = $1")
+        .bind(&user_id.into_inner())
+        .fetch_all(&**pool) 
+        .await;
+
+    match dictionaries {
+        Ok(dictionaries) => HttpResponse::Ok().json(dictionaries),
         Err(_) => HttpResponse::NotFound().finish(),
     }
 }
