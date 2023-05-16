@@ -7,12 +7,25 @@ pub struct Config {
     pub server_bind: String,
     pub server_port: u16,
     pub db_use_tls: bool,
+    pub use_pgbouncer: bool,
 }
 
 impl Config {
     pub fn new() -> Self {
+        let use_pgbouncer = env::var("USE_PGBOUNCER")
+            .unwrap_or_else(|_| "false".to_string())
+            .to_lowercase()
+            .parse::<bool>()
+            .unwrap_or(false);
+
+        let db_url = if use_pgbouncer {
+            format!("{}?sslmode=disable", env::var("DATABASE_URL").expect("DATABASE_URL must be set"))
+        } else {
+            env::var("DATABASE_URL").expect("DATABASE_URL must be set")
+        };
+
         Self {
-            db_url: env::var("DATABASE_URL").expect("DATABASE_URL must be set"),
+            db_url,
             db_pool_min: env::var("DB_POOL_MIN")
                 .unwrap_or_else(|_| "5".to_string())
                 .parse()
@@ -30,6 +43,7 @@ impl Config {
                 .unwrap_or_else(|_| "true".to_string())
                 .parse()
                 .expect("DB_USE_TLS must be a boolean"),
+            use_pgbouncer,
         }
     }
 }
