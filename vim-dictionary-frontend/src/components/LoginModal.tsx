@@ -33,13 +33,20 @@ const LoginModal: React.FC<LoginModalProps> = ({
         username: username,
         password: password,
       };
-      const token = await loginUser(loginData);
-      if (!token) {
-        setErrorMessage(token.message);
+      const response = await loginUser(loginData);
+      if (!response.token) {
+        setErrorMessage("Incorrect login");
         return;
       }
 
-      Cookies.set("token", token);
+      Cookies.set("token", response.token, {
+        secure: true,
+        sameSite: "Strict",
+      });
+      Cookies.set("user_id", response.user_id.toString(), {
+        secure: true,
+        sameSite: "Strict",
+      });
       onLoginSuccess();
       onClose();
     } catch (error) {

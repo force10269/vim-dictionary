@@ -4,6 +4,7 @@ use actix_web::{get, post, delete, web, HttpResponse, HttpRequest, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use jsonwebtoken::{encode, decode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::PgPool;
 use std::env;
 use log::info;
@@ -80,8 +81,13 @@ async fn login(
                 };
                 let token = encode(&Header::default(), &claims, &key).unwrap();
 
+                let response_data = json!({
+                    "token": token,
+                    "user_id": &user.id
+                });
+
                 identity.remember(token.clone());
-                HttpResponse::Ok().json(token)
+                HttpResponse::Ok().json(response_data)
             } else {
                 HttpResponse::Unauthorized().finish()
             }

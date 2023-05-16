@@ -24,6 +24,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({
     try {
       await logoutUser();
       Cookies.remove("token");
+      Cookies.remove("user_id");
       onLogoutSuccess();
     } catch (error) {
       console.error("Error logging out:", error);
