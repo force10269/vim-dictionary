@@ -31,6 +31,17 @@ export const Header = styled.header`
   position: fixed;
   top: 0;
   z-index: 1000;
+
+  @media(min-width: 768px) and (max-width: 991px) {
+    height: 12%;
+  }
+
+  @media (min-width: 992px) and (max-width: 1199px) {
+    height: 13%;
+  }
+
+  @media (min-width: 1200px) {
+    height: 15%; 
 `;
 
 export const AuthButton = styled.button`
