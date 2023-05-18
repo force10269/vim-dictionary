@@ -23,6 +23,7 @@ import {
 import LoginModal from "@/components/LoginModal";
 import SignupModal from "@/components/SignupModal";
 import LogoutModal from "@/components/LogoutModal";
+import EntriesModal from "@/components/EntriesModal";
 import { keyMappings } from "@/data/default-dictionary";
 import { validateToken } from "@/services/userService";
 
@@ -40,6 +41,7 @@ export default function Home() {
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [signupModalVisible, setSignupModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [entriesModalVisible, setEntriesModalVisible] = useState(false);
 
   useEffect(() => {
     const checkToken = async () => {
@@ -204,6 +206,9 @@ export default function Home() {
         )}
         {loggedIn && (
           <>
+            <AuthButton onClick={() => setEntriesModalVisible(true)}>
+              My Entries
+            </AuthButton>
             <AuthButton onClick={() => setLogoutModalVisible(true)}>
               Log Out
             </AuthButton>
@@ -214,6 +219,10 @@ export default function Home() {
                 setLoggedIn(false);
                 setLogoutModalVisible(false);
               }}
+            />
+            <EntriesModal
+              show={entriesModalVisible}
+              onClose={() => setEntriesModalVisible(false)}
             />
           </>
         )}
