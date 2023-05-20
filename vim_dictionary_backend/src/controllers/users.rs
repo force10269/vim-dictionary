@@ -49,20 +49,23 @@ pub struct Claims {
 #[get("/user_data/{user_id}")]
 async fn get_user_data(pool: web::Data<PgPool>, user_id: web::Path<i32>) -> impl Responder {
     let user_id = user_id.into_inner();
+
     let dictionaries = sqlx::query_as::<_, Dictionary>("SELECT * FROM dictionaries WHERE user_id = $1")
         .bind(&user_id)
         .fetch_all(&**pool)
         .await
         .unwrap();
 
-    let sections = sqlx::query_as::<_, Section>("SELECT * FROM sections WHERE dictionary_id = $1")
-        .bind(&user_id)
+    let dictionary_ids: Vec<i32> = dictionaries.iter().map(|dictionary| dictionary.id).collect();
+    let sections = sqlx::query_as::<_, Section>("SELECT * FROM sections WHERE dictionary_id = ANY($1)")
+        .bind(&dictionary_ids)
         .fetch_all(&**pool)
         .await
         .unwrap();
 
-    let entries = sqlx::query_as::<_, Entry>("SELECT * FROM entries WHERE section_id = $1")
-        .bind(&user_id)
+    let section_ids: Vec<i32> = sections.iter().map(|section| section.id).collect();
+    let entries = sqlx::query_as::<_, Entry>("SELECT * FROM entries WHERE section_id = ANY($1)")
+        .bind(&section_ids)
         .fetch_all(&**pool)
         .await
         .unwrap();
