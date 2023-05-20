@@ -1,4 +1,4 @@
-use crate::models::Entry;
+use crate::models::{NewEntry, Entry};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use sqlx::{PgPool, Row};
 
@@ -50,7 +50,7 @@ async fn get_entries_by_section_id(pool: web::Data<PgPool>, section_id: web::Pat
 #[post("/entries")]
 async fn create_entry(
     pool: web::Data<PgPool>,
-    entry: web::Json<Entry>,
+    entry: web::Json<NewEntry>,
 ) -> impl Responder {
     let result = sqlx::query(
         "INSERT INTO entries (keymap, description, mode, section_id) VALUES ($1, $2, $3, $4) RETURNING keymap, description, mode, section_id",
@@ -64,8 +64,7 @@ async fn create_entry(
 
     match result {
         Ok(row) => {
-            let entry = Entry {
-                id: row.get("id"),
+            let entry = NewEntry {
                 keymap: row.get("keymap"),
                 description: row.get("description"),
                 mode: row.get("mode"),

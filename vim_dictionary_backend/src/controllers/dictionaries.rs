@@ -1,4 +1,4 @@
-use crate::models::Dictionary;
+use crate::models::{NewDictionary, Dictionary};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use sqlx::{PgPool, Row}; 
 
@@ -50,7 +50,7 @@ async fn get_dictionaries_by_user_id(pool: web::Data<PgPool>, user_id: web::Path
 #[post("/dictionaries")]
 async fn create_dictionary(
     pool: web::Data<PgPool>,
-    dictionary: web::Json<Dictionary>,
+    dictionary: web::Json<NewDictionary>,
 ) -> impl Responder {
     let result = sqlx::query(
         "INSERT INTO dictionaries (name, user_id) VALUES ($1, $2) RETURNING id, name, user_id",
@@ -62,8 +62,7 @@ async fn create_dictionary(
 
     match result {
         Ok(row) => {
-            let dictionary = Dictionary {
-                id: row.get("id"),
+            let dictionary = NewDictionary {
                 name: row.get("name"),
                 user_id: row.get("user_id"),
             };

@@ -1,4 +1,4 @@
-use crate::models::Section;
+use crate::models::{NewSection, Section};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use sqlx::{PgPool, Row};
 
@@ -49,7 +49,7 @@ async fn get_sections_by_dictionary_id(pool: web::Data<PgPool>, dictionary_id: w
 #[post("/sections")]
 async fn create_section(
     pool: web::Data<PgPool>,
-    section: web::Json<Section>,
+    section: web::Json<NewSection>,
 ) -> impl Responder {
     let result = sqlx::query(
         "INSERT INTO sections (name, dictionary_id) VALUES ($1, $2) RETURNING id, name, dictionary_id",
@@ -61,8 +61,7 @@ async fn create_section(
 
     match result {
         Ok(row) => {
-            let section = Section {
-                id: row.get("id"),
+            let section = NewSection {
                 name: row.get("name"),
                 dictionary_id: row.get("dictionary_id")
             };
