@@ -144,6 +144,8 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             height: "80vh",
             maxWidth: "unset",
             margin: "auto",
+            overflowY: "auto",
+            maxHeight: "unset",
           }}
         >
           <Button className={styles.closeButton} onClick={onClose}>
