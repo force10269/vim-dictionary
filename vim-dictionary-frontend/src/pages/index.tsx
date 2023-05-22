@@ -25,7 +25,7 @@ import SignupModal from "@/components/SignupModal";
 import LogoutModal from "@/components/LogoutModal";
 import EntriesModal from "@/components/EntriesModal";
 import { keyMappings } from "@/data/default-dictionary";
-import { validateToken } from "@/services/userService";
+import { UserData, getUserData, validateToken } from "@/services/userService";
 
 interface KeyMapping {
   key: string;
@@ -37,6 +37,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [globalSearch, setGlobalSearch] = useState("");
   const [mode, setMode] = useState("normal");
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [loginModalVisible, setLoginModalVisible] = useState(false);
   const [signupModalVisible, setSignupModalVisible] = useState(false);
@@ -47,7 +48,14 @@ export default function Home() {
     const checkToken = async () => {
       const isValid = await validateToken();
       if (isValid) {
-        setLoggedIn(true);
+        const userId = Cookies.get("user_id");
+        if (typeof userId === "string") {
+          const userData = await getUserData(userId);
+
+          // Caching for user data should be accomplished here
+          setUserData(userData);
+          setLoggedIn(true);
+        }
       } else {
         Cookies.remove("token");
       }
@@ -223,6 +231,7 @@ export default function Home() {
             <EntriesModal
               show={entriesModalVisible}
               onClose={() => setEntriesModalVisible(false)}
+              userData={userData}
             />
           </>
         )}

@@ -49,6 +49,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
       });
       onLoginSuccess();
       onClose();
+      window.location.reload();
     } catch (error) {
       setErrorMessage("Some error happened");
     } finally {

@@ -14,19 +14,19 @@ interface LoginData {
   password: string;
 }
 
-interface Dictionary {
+export interface Dictionary {
   id: number;
   name: string;
   user_id: number;
 }
 
-interface Section {
+export interface Section {
   id: number;
   name: string;
   dictionary_id: number;
 }
 
-interface KeyMapping {
+export interface KeyMapping {
   id: number;
   key: string;
   mode: string;
