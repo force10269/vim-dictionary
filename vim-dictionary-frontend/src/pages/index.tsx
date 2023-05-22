@@ -61,7 +61,7 @@ export default function Home() {
       }
     };
     checkToken();
-  }, []);
+  }, [loggedIn]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);

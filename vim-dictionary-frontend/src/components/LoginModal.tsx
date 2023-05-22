@@ -47,9 +47,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
         secure: true,
         sameSite: "Strict",
       });
+
       onLoginSuccess();
       onClose();
-      window.location.reload();
     } catch (error) {
       setErrorMessage("Some error happened");
     } finally {

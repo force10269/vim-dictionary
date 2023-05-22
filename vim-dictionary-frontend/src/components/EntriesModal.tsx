@@ -12,7 +12,16 @@ import {
   KeyMappingsHeaderRow,
   KeyMappingsRow,
   TableCell,
-} from "@/styles/index.module";
+  Button,
+  BackButton,
+  AddButton,
+  ModalTitle,
+  ModalSubTitle,
+  ModalContent,
+  ModalActions,
+} from "@/styles/EntriesModal.module";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 interface EntriesModalProps {
   show: boolean;
@@ -39,14 +48,25 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       return <></>;
     }
 
-    return userData.dictionaries.map((dictionary) => (
-      <div key={dictionary.id}>
-        <h2>{dictionary.name}</h2>
-        <button onClick={() => handleViewDictionary(dictionary)}>View</button>
-        <button>Edit</button>
-        <button>Delete</button>
-      </div>
-    ));
+    return (
+      <>
+        {userData.dictionaries.map((dictionary) => (
+          <ModalContent key={dictionary.id}>
+            <ModalActions>
+              <ModalSubTitle>{dictionary.name}</ModalSubTitle>
+              <div>
+                <Button onClick={() => handleViewDictionary(dictionary)}>
+                  View
+                </Button>
+                <Button>Edit</Button>
+                <Button>Delete</Button>
+              </div>
+            </ModalActions>
+          </ModalContent>
+        ))}
+        <AddButton>+</AddButton>
+      </>
+    );
   };
 
   const renderSectionsAndEntries = () => {
@@ -56,51 +76,82 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     const sections = userData.sections.filter(
       (section) => section.dictionary_id === currentDictionary?.id
     );
+
     const entries = userData.entries.filter((entry) =>
-      sections.some((section) => section.id === entry.id)
+      sections.some((section) => section.id === entry.section_id)
     );
 
     return (
-      <div>
+      <ModalContent>
         {sections.map((section: Section) => (
           <div key={section.id}>
-            <h3>{section.name}</h3>
-            <button>Edit</button>
-            <button>Delete</button>
+            <ModalActions style={{ paddingTop: "3vh" }}>
+              <ModalSubTitle>{section.name}</ModalSubTitle>
+              <div>
+                <Button>Edit</Button>
+                <Button>Delete</Button>
+              </div>
+            </ModalActions>
             {entries.map((entry: KeyMapping) => (
               <KeyMappingsTable key={entry.id}>
                 <thead>
                   <KeyMappingsHeaderRow>
-                    <TableCell>Key</TableCell>
-                    <TableCell>Description</TableCell>
+                    <TableCell width="20%" style={{ textAlign: "center" }}>
+                      Keymap
+                    </TableCell>
+                    <TableCell width="30%" style={{ textAlign: "center" }}>
+                      Description
+                    </TableCell>
+                    <TableCell width="50%" />
                   </KeyMappingsHeaderRow>
                 </thead>
                 <tbody>
-                  <KeyMappingsRow key={`${entry.key}-${entry.mode}`}>
-                    <TableCell>{entry.key}</TableCell>
-                    <TableCell>{entry.description}</TableCell>
-                    <button>Edit</button>
-                    <button>Delete</button>
+                  <KeyMappingsRow key={`${entry.keymap}-${entry.mode}`}>
+                    <TableCell width="20%">{entry.keymap}</TableCell>
+                    <TableCell width="30%">{entry.description}</TableCell>
+                    <TableCell>
+                      <Button>Edit</Button>
+                      <Button>Delete</Button>
+                    </TableCell>
                   </KeyMappingsRow>
                 </tbody>
               </KeyMappingsTable>
             ))}
+            <AddButton style={{ marginTop: "3vh" }}>+</AddButton>
           </div>
         ))}
-      </div>
+        <BackButton onClick={() => setCurrentDictionary(null)}>
+          <FontAwesomeIcon icon={faArrowLeft} size={"2x"} />
+        </BackButton>
+      </ModalContent>
     );
   };
 
   return (
-    <div className={styles.modal} style={{ display: show ? "flex" : "none" }}>
+    <div
+      className={styles.modal}
+      style={{
+        display: show ? "flex" : "none",
+      }}
+    >
       {loading ? (
         <LoadingOverlay message="Processing..." />
       ) : (
-        <div className={styles.modalContent}>
-          <button className={styles.closeButton} onClick={onClose}>
+        <div
+          className={styles.modalContent}
+          style={{
+            width: "80vw",
+            height: "80vh",
+            maxWidth: "unset",
+            margin: "auto",
+          }}
+        >
+          <Button className={styles.closeButton} onClick={onClose}>
             &times;
-          </button>
-          <h2 className={styles.modalHeader}>Personal Entries</h2>
+          </Button>
+          <ModalTitle className={styles.modalHeader}>
+            Personal Entries
+          </ModalTitle>
           {!currentDictionary
             ? renderDictionaries()
             : renderSectionsAndEntries()}

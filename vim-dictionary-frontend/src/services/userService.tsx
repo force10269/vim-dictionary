@@ -28,7 +28,8 @@ export interface Section {
 
 export interface KeyMapping {
   id: number;
-  key: string;
+  section_id: number;
+  keymap: string;
   mode: string;
   description: string;
 }
@@ -98,11 +99,11 @@ export async function validateToken(): Promise<boolean> {
 }
 
 export async function getUserData(user_id: string): Promise<UserData> {
-  const cachedData = localStorage.getItem("user_data");
-
-  if (cachedData) {
-    return JSON.parse(cachedData);
-  }
+  // const cachedData = localStorage.getItem("user_data");
+  //
+  // if (cachedData) {
+  //   return JSON.parse(cachedData);
+  // }
 
   const response = await axios.get(`${API_BASE_URL}/api/user_data/${user_id}`);
   const userData: UserData = {
