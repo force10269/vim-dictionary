@@ -14,15 +14,28 @@ interface LoginData {
   password: string;
 }
 
-export interface KeyMapping {
+interface Dictionary {
+  id: number;
+  name: string;
+  user_id: number;
+}
+
+interface Section {
+  id: number;
+  name: string;
+  dictionary_id: number;
+}
+
+interface KeyMapping {
+  id: number;
   key: string;
   mode: string;
   description: string;
 }
 
 export interface UserData {
-  dictionaries: any[];
-  sections: any[];
+  dictionaries: Dictionary[];
+  sections: Section[];
   entries: KeyMapping[];
 }
 
