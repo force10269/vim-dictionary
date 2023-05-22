@@ -64,36 +64,41 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             </ModalActions>
           </ModalContent>
         ))}
-        <AddButton>+</AddButton>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <AddButton>+</AddButton>
+          <span style={{ marginLeft: "10px" }}>Add Dictionary</span>
+        </div>
       </>
     );
   };
 
   const renderSectionsAndEntries = () => {
-    if (!userData) {
+    if (!userData || !currentDictionary) {
       return <></>;
     }
-    const sections = userData.sections.filter(
-      (section) => section.dictionary_id === currentDictionary?.id
-    );
 
-    const entries = userData.entries.filter((entry) =>
-      sections.some((section) => section.id === entry.section_id)
+    const sections = userData.sections.filter(
+      (section) => section.dictionary_id === currentDictionary.id
     );
 
     return (
       <ModalContent>
-        {sections.map((section: Section) => (
-          <div key={section.id}>
-            <ModalActions style={{ paddingTop: "3vh" }}>
-              <ModalSubTitle>{section.name}</ModalSubTitle>
-              <div>
-                <Button>Edit</Button>
-                <Button>Delete</Button>
-              </div>
-            </ModalActions>
-            {entries.map((entry: KeyMapping) => (
-              <KeyMappingsTable key={entry.id}>
+        <ModalSubTitle>{currentDictionary.name}</ModalSubTitle>
+        {sections.map((section: Section) => {
+          const entries = userData.entries.filter(
+            (entry) => entry.section_id === section.id
+          );
+
+          return (
+            <div key={section.id}>
+              <ModalActions style={{ paddingTop: "3vh" }}>
+                <ModalSubTitle>{section.name}</ModalSubTitle>
+                <div>
+                  <Button>Edit</Button>
+                  <Button>Delete</Button>
+                </div>
+              </ModalActions>
+              <KeyMappingsTable>
                 <thead>
                   <KeyMappingsHeaderRow>
                     <TableCell width="20%" style={{ textAlign: "center" }}>
@@ -106,20 +111,29 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                   </KeyMappingsHeaderRow>
                 </thead>
                 <tbody>
-                  <KeyMappingsRow key={`${entry.keymap}-${entry.mode}`}>
-                    <TableCell width="20%">{entry.keymap}</TableCell>
-                    <TableCell width="30%">{entry.description}</TableCell>
-                    <TableCell>
-                      <Button>Edit</Button>
-                      <Button>Delete</Button>
-                    </TableCell>
-                  </KeyMappingsRow>
+                  {entries.map((entry: KeyMapping) => (
+                    <KeyMappingsRow key={`${entry.keymap}-${entry.mode}`}>
+                      <TableCell width="20%">{entry.keymap}</TableCell>
+                      <TableCell width="30%">{entry.description}</TableCell>
+                      <TableCell>
+                        <Button>Edit</Button>
+                        <Button>Delete</Button>
+                      </TableCell>
+                    </KeyMappingsRow>
+                  ))}
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <AddButton>+</AddButton>
+                    <span style={{ marginLeft: "10px" }}>Add Entry</span>
+                  </div>
                 </tbody>
               </KeyMappingsTable>
-            ))}
-            <AddButton style={{ marginTop: "3vh" }}>+</AddButton>
-          </div>
-        ))}
+            </div>
+          );
+        })}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <AddButton style={{ marginTop: "3vh" }}>+</AddButton>
+          <span style={{ marginLeft: "10px" }}>Add Section</span>
+        </div>
         <BackButton onClick={() => setCurrentDictionary(null)}>
           <FontAwesomeIcon icon={faArrowLeft} size={"2x"} />
         </BackButton>
