@@ -31,6 +31,8 @@ interface KeyMapping {
   key: string;
   mode: string;
   description: string;
+  section?: string;
+  dictionary?: string;
 }
 
 export default function Home() {
@@ -43,6 +45,7 @@ export default function Home() {
   const [signupModalVisible, setSignupModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [entriesModalVisible, setEntriesModalVisible] = useState(false);
+  const [keyMappingData, setKeyMappingData] = useState<KeyMapping[]>([]);
 
   useEffect(() => {
     const checkToken = async () => {
@@ -52,7 +55,26 @@ export default function Home() {
         if (typeof userId === "string") {
           const userData = await getUserData(userId);
 
-          // Caching for user data should be accomplished here
+          // Combine user data with key mappings
+          const userMappings = userData.entries.map((entry) => {
+            const section = userData.sections.find(
+              (section) => section.id === entry.section_id
+            );
+            const dictionary = section
+              ? userData.dictionaries.find(
+                  (dict) => dict.id === section.dictionary_id
+                )
+              : null;
+
+            return {
+              key: entry.keymap,
+              mode: entry.mode,
+              description: entry.description,
+              section: section ? section.name : "",
+              dictionary: dictionary ? dictionary.name : "",
+            };
+          }) as KeyMapping[];
+          setKeyMappingData(userMappings);
           setUserData(userData);
           setLoggedIn(true);
         }
@@ -62,6 +84,8 @@ export default function Home() {
     };
     checkToken();
   }, [loggedIn]);
+
+  const allMappings = [...keyMappings, ...keyMappingData];
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -115,7 +139,7 @@ export default function Home() {
   };
 
   const filterKeyMappings = (
-    keyMappings: KeyMapping[],
+    keyMappings: Array<KeyMapping>,
     searchTerm: string,
     mode: string
   ) => {
@@ -135,13 +159,19 @@ export default function Home() {
   };
 
   const filterGlobalSearch = (
-    keyMappings: KeyMapping[],
+    keyMappings: Array<KeyMapping>,
     globalSearch: string
   ) => {
     return keyMappings.filter((mapping) => {
       if (
         globalSearch &&
-        !mapping.description.toLowerCase().includes(globalSearch.toLowerCase())
+        !(
+          mapping.description
+            .toLowerCase()
+            .includes(globalSearch.toLowerCase()) ||
+          mapping.section?.toLowerCase().includes(globalSearch.toLowerCase()) ||
+          mapping.dictionary?.toLowerCase().includes(globalSearch.toLowerCase())
+        )
       ) {
         return false;
       }
@@ -150,7 +180,7 @@ export default function Home() {
   };
 
   const filteredMappings = (() => {
-    let result = keyMappings;
+    let result = allMappings;
 
     if (search) {
       result = filterKeyMappings(result, search, mode);
@@ -226,6 +256,8 @@ export default function Home() {
               onLogoutSuccess={() => {
                 setLoggedIn(false);
                 setLogoutModalVisible(false);
+                setKeyMappingData(keyMappings);
+                setUserData(null);
               }}
             />
             <EntriesModal
@@ -267,6 +299,8 @@ export default function Home() {
               <KeyMappingsHeaderRow>
                 <TableCell>Key</TableCell>
                 <TableCell>Description</TableCell>
+                <TableCell>Section</TableCell>
+                <TableCell>Dictionary</TableCell>
               </KeyMappingsHeaderRow>
             </thead>
             <tbody>
@@ -274,6 +308,8 @@ export default function Home() {
                 <KeyMappingsRow key={`${mapping.key}-${mapping.mode}`}>
                   <TableCell>{mapping.key}</TableCell>
                   <TableCell>{mapping.description}</TableCell>
+                  <TableCell>{mapping.section || "Default"}</TableCell>
+                  <TableCell>{mapping.dictionary || "Default"}</TableCell>
                 </KeyMappingsRow>
               ))}
             </tbody>
