@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import LoadingOverlay from "./LoadingOverlay";
+import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
   Dictionary,
@@ -22,7 +23,10 @@ import {
 } from "@/styles/EntriesModal.module";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import { createDictionary } from "@/services/dictionaryService";
+import {
+  createDictionary,
+  deleteDictionary,
+} from "@/services/dictionaryService";
 import Cookies from "js-cookie";
 
 interface EntriesModalProps {
@@ -51,8 +55,15 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const [dictionaryFormData, setDictionaryFormData] =
     useState<DictionaryFormData>({ name: "", user_id: 0 });
 
+  const [dictionaryToDelete, setDictionaryToDelete] =
+    useState<Dictionary | null>(null);
+
   const handleViewDictionary = (dictionary: Dictionary) => {
     setCurrentDictionary(dictionary);
+  };
+
+  const handleDeleteDictionary = (dictionary: Dictionary) => {
+    setDictionaryToDelete(dictionary);
   };
 
   const handleCreateDictionaryInputChange = (
@@ -70,8 +81,22 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setShowCreateDictionaryForm(false);
   };
 
+  const handleDeleteDictionarySubmit = async (id: number) => {
+    const success = await deleteDictionary(id);
+    if (success) {
+      setDictionaryToDelete(null);
+      // TODO: remove the deleted dictionary from the view
+    } else {
+      console.error(`Failed to delete dictionary with ID ${id}`);
+    }
+  };
+
   const handleCreateDictionaryFormClose = () => {
     setShowCreateDictionaryForm(false);
+  };
+
+  const handleDeleteDictionaryClose = () => {
+    setDictionaryToDelete(null);
   };
 
   const handleAddDictionaryClick = () => {
@@ -104,7 +129,9 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                   View
                 </Button>
                 <Button>Edit</Button>
-                <Button>Delete</Button>
+                <Button onClick={() => handleDeleteDictionary(dictionary)}>
+                  Delete
+                </Button>
               </div>
             </ModalActions>
           </ModalContent>
@@ -137,6 +164,14 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
               <button type="submit">Create Dictionary</button>
             </form>
           </div>
+        )}
+
+        {dictionaryToDelete && (
+          <DeleteDictionaryPrompt
+            dictionary={dictionaryToDelete}
+            onClose={handleDeleteDictionaryClose}
+            onSubmit={handleDeleteDictionarySubmit}
+          />
         )}
       </>
     );
