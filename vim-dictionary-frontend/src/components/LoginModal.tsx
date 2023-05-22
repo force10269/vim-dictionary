@@ -83,14 +83,14 @@ const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           )}
           <form className={styles.modalForm} onSubmit={handleSubmit}>
-            <label htmlFor="username">Username</label>
+            <label htmlFor="login_username">Username</label>
             <input
               type="text"
               id="login_username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
-            <label htmlFor="password">Password</label>
+            <label htmlFor="login_password">Password</label>
             <input
               type="password"
               id="login_password"

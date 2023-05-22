@@ -22,11 +22,18 @@ import {
 } from "@/styles/EntriesModal.module";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { createDictionary } from "@/services/dictionaryService";
+import Cookies from "js-cookie";
 
 interface EntriesModalProps {
   show: boolean;
   onClose: () => void;
   userData: UserData | null;
+}
+
+interface DictionaryFormData {
+  name: string;
+  user_id: number;
 }
 
 const EntriesModal: React.FC<EntriesModalProps> = ({
@@ -39,8 +46,46 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     null
   );
 
+  const [showCreateDictionaryForm, setShowCreateDictionaryForm] =
+    useState(false);
+  const [dictionaryFormData, setDictionaryFormData] =
+    useState<DictionaryFormData>({ name: "", user_id: 0 });
+
   const handleViewDictionary = (dictionary: Dictionary) => {
     setCurrentDictionary(dictionary);
+  };
+
+  const handleCreateDictionaryInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = event.target;
+    setDictionaryFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateDictionaryFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    await createDictionary(dictionaryFormData);
+    setShowCreateDictionaryForm(false);
+  };
+
+  const handleCreateDictionaryFormClose = () => {
+    setShowCreateDictionaryForm(false);
+  };
+
+  const handleAddDictionaryClick = () => {
+    setShowCreateDictionaryForm(true);
+    const user_id = Cookies.get("user_id");
+    if (!user_id) {
+      console.error("Invalid user ID.");
+      return;
+    }
+
+    setDictionaryFormData({
+      name: "",
+      user_id: parseInt(user_id, 10),
+    });
   };
 
   const renderDictionaries = () => {
@@ -65,9 +110,34 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
           </ModalContent>
         ))}
         <div style={{ display: "flex", alignItems: "center" }}>
-          <AddButton>+</AddButton>
+          <AddButton onClick={handleAddDictionaryClick}>+</AddButton>
           <span style={{ marginLeft: "10px" }}>Add Dictionary</span>
         </div>
+        {showCreateDictionaryForm && (
+          <div>
+            <form
+              className={styles.modalForm}
+              onSubmit={handleCreateDictionaryFormSubmit}
+              style={{ marginTop: "20px" }}
+            >
+              <Button
+                onClick={handleCreateDictionaryFormClose}
+                style={{ width: "5vw" }}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} size={"1x"} />
+              </Button>
+              <label htmlFor="name">Dictionary Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={dictionaryFormData.name}
+                onChange={handleCreateDictionaryInputChange}
+              />
+              <button type="submit">Create Dictionary</button>
+            </form>
+          </div>
+        )}
       </>
     );
   };
@@ -121,10 +191,15 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                       </TableCell>
                     </KeyMappingsRow>
                   ))}
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <AddButton>+</AddButton>
-                    <span style={{ marginLeft: "10px" }}>Add Entry</span>
-                  </div>
+                  <tr>
+                    <td
+                      colSpan={3}
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      <AddButton>+</AddButton>
+                      <span style={{ marginLeft: "10px" }}>Add Entry</span>
+                    </td>
+                  </tr>
                 </tbody>
               </KeyMappingsTable>
             </div>
