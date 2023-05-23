@@ -1,4 +1,11 @@
 import React, { useState } from "react";
+import { Dictionary } from "@/services/userService";
+import {
+  DeletePromptContainer,
+  DeletePromptContent,
+  DeletePromptButton,
+  Input,
+} from "@/styles/DeleteDictionaryPrompt.module";
 
 interface DeleteDictionaryPromptProps {
   dictionary: Dictionary;
@@ -27,20 +34,23 @@ const DeleteDictionaryPrompt: React.FC<DeleteDictionaryPromptProps> = ({
   };
 
   return (
-    <div>
-      <h2>
-        In order to delete this dictionary, please type in the name of the
-        dictionary:
-        {dictionary.name}
-      </h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={name} onChange={handleChange} />
-        <button type="submit">Submit</button>
-        <button type="button" onClick={onClose}>
-          Cancel
-        </button>
-      </form>
-    </div>
+    <DeletePromptContainer>
+      <DeletePromptContent>
+        <h2>
+          In order to delete this dictionary, please type in the name of the
+          dictionary:
+          <br />
+          {dictionary.name}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <Input type="text" value={name} onChange={handleChange} />
+          <DeletePromptButton type="submit">Submit</DeletePromptButton>
+          <DeletePromptButton type="button" onClick={onClose}>
+            Cancel
+          </DeletePromptButton>
+        </form>
+      </DeletePromptContent>
+    </DeletePromptContainer>
   );
 };
 
