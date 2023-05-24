@@ -64,7 +64,8 @@ async fn create_entry(
 
     match result {
         Ok(row) => {
-            let entry = NewEntry {
+            let entry = Entry {
+                id: row.get("id"),
                 keymap: row.get("keymap"),
                 description: row.get("description"),
                 mode: row.get("mode"),

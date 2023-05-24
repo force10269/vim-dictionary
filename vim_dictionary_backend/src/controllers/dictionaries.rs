@@ -62,7 +62,8 @@ async fn create_dictionary(
 
     match result {
         Ok(row) => {
-            let dictionary = NewDictionary {
+            let dictionary = Dictionary {
+                id: row.get("id"),
                 name: row.get("name"),
                 user_id: row.get("user_id"),
             };

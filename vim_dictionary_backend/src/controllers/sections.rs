@@ -61,7 +61,8 @@ async fn create_section(
 
     match result {
         Ok(row) => {
-            let section = NewSection {
+            let section = Section {
+                id: row.get("id"),
                 name: row.get("name"),
                 dictionary_id: row.get("dictionary_id")
             };
