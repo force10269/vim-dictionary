@@ -26,10 +26,17 @@ const DeleteDictionaryPrompt: React.FC<DeleteDictionaryPromptProps> = ({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (name === dictionary.name) {
-      onSubmit(dictionary.id);
-    } else {
+    if (name !== dictionary.name) {
       alert("The name you entered did not match the dictionary name.");
+      return;
+    }
+
+    try {
+      onSubmit(dictionary.id);
+      onClose();
+    } catch (err) {
+      console.error("Failed to delete dictionary", err);
+      alert("Failed to delete dictionary. Please try again later.");
     }
   };
 

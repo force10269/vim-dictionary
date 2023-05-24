@@ -38,8 +38,18 @@ const AddDictionaryPrompt: React.FC<AddDictionaryPromptProps> = ({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    onSubmit(event, dictionaryFormData);
-    onClose();
+    if(!dictionaryFormData.name || dictionaryFormData.name.length < 3) {
+      alert("Please enter a valid dictionary name (at least 3 characters long).");
+      return;
+    }
+
+    try {
+      onSubmit(event, dictionaryFormData);
+      onClose();
+    } catch (err) {
+      console.error("Failed to create dictionary", err);
+      alert("Failed to create dictionary. Please try again later.");
+    }
   };
 
   return (

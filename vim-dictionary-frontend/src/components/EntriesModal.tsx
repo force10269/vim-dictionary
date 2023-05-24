@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LoadingOverlay from "./LoadingOverlay";
 import AddDictionaryPrompt from "./AddDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
@@ -48,9 +48,16 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 }) => {
   const [userId, setUserId] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [dictionaries, setDictionaries] = useState<Dictionary[]>([]);
   const [currentDictionary, setCurrentDictionary] = useState<Dictionary | null>(
     null
   );
+
+  useEffect(() => {
+    if (userData) {
+      setDictionaries(userData.dictionaries);
+    }
+  }, [userData]);
 
   const [showCreateDictionaryForm, setShowCreateDictionaryForm] =
     useState(false);
@@ -71,16 +78,21 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     dictionaryFormData: DictionaryFormData
   ) => {
     event.preventDefault();
-    await createDictionary(dictionaryFormData);
-    // TODO: add the created dictionary to the view
+    const response = await createDictionary(dictionaryFormData);
+    const newDictionary = {
+      id: response.id,
+      name: response.name,
+      user_id: response.user_id,
+    };
+    setDictionaries((prev) => [...prev, newDictionary]);
     setShowCreateDictionaryForm(false);
   };
 
   const handleDeleteDictionarySubmit = async (id: number) => {
     const success = await deleteDictionary(id);
     if (success) {
+      setDictionaries((prev) => prev.filter((dict) => dict.id !== id));
       setDictionaryToDelete(null);
-      // TODO: remove the deleted dictionary from the view
     } else {
       console.error(`Failed to delete dictionary with ID ${id}`);
     }
@@ -112,7 +124,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
     return (
       <>
-        {userData.dictionaries.map((dictionary) => (
+        {dictionaries.map((dictionary) => (
           <ModalContent key={dictionary.id}>
             <ModalActions>
               <ModalSubTitle>{dictionary.name}</ModalSubTitle>
