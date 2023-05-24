@@ -26,6 +26,7 @@ import LogoutModal from "@/components/LogoutModal";
 import EntriesModal from "@/components/EntriesModal";
 import { keyMappings } from "@/data/default-dictionary";
 import { UserData, getUserData, validateToken } from "@/services/userService";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 interface KeyMapping {
   key: string;
@@ -37,6 +38,7 @@ interface KeyMapping {
 
 export default function Home() {
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [globalSearch, setGlobalSearch] = useState("");
   const [mode, setMode] = useState("normal");
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -49,6 +51,7 @@ export default function Home() {
 
   useEffect(() => {
     const checkToken = async () => {
+      setLoading(true);
       const isValid = await validateToken();
       if (isValid) {
         const userId = Cookies.get("user_id");
@@ -81,6 +84,7 @@ export default function Home() {
       } else {
         Cookies.remove("token");
       }
+      setLoading(false);
     };
     checkToken();
   }, [loggedIn]);
@@ -221,7 +225,9 @@ export default function Home() {
           placeholder="Global search..."
           aria-label="Global search"
         />
-        {!loggedIn && (
+        {loading ? (
+          <LoadingOverlay message="Loading..." />
+        ) : !loggedIn ? (
           <>
             <AuthButton onClick={() => setLoginModalVisible(true)}>
               Log In
@@ -246,8 +252,7 @@ export default function Home() {
               }}
             />
           </>
-        )}
-        {loggedIn && (
+        ) : (
           <>
             <AuthButton onClick={() => setEntriesModalVisible(true)}>
               My Entries
