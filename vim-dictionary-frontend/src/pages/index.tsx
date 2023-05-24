@@ -304,8 +304,8 @@ export default function Home() {
               </KeyMappingsHeaderRow>
             </thead>
             <tbody>
-              {filteredMappings.map((mapping: KeyMapping) => (
-                <KeyMappingsRow key={`${mapping.key}-${mapping.mode}`}>
+              {filteredMappings.map((mapping: KeyMapping, index: number) => (
+                <KeyMappingsRow key={index}>
                   <TableCell>{mapping.key}</TableCell>
                   <TableCell>{mapping.description}</TableCell>
                   <TableCell>{mapping.section || "Default"}</TableCell>
