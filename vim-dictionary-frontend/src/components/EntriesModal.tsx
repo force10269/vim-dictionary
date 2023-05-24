@@ -3,6 +3,7 @@ import LoadingOverlay from "./LoadingOverlay";
 import AddDictionaryPrompt from "./AddDictionaryPrompt";
 import EditDictionaryPrompt from "./EditDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
+import AddSectionPrompt from "./AddSectionPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
   Dictionary,
@@ -30,6 +31,7 @@ import {
   updateDictionary,
   deleteDictionary,
 } from "@/services/dictionaryService";
+import { createSection } from "@/services/sectionService";
 import Cookies from "js-cookie";
 
 interface EntriesModalProps {
@@ -43,14 +45,21 @@ interface DictionaryFormData {
   user_id: number;
 }
 
+interface SectionFormData {
+  name: string;
+  dictionary_id: number;
+}
+
 const EntriesModal: React.FC<EntriesModalProps> = ({
   show,
   onClose,
   userData,
 }) => {
   const [userId, setUserId] = useState(0);
+  const [dictionaryId, setDictionaryId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dictionaries, setDictionaries] = useState<Dictionary[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
   const [currentDictionary, setCurrentDictionary] = useState<Dictionary | null>(
     null
   );
@@ -67,6 +76,8 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const [showCreateDictionaryForm, setShowCreateDictionaryForm] =
     useState(false);
+
+  const [showCreateSectionForm, setShowCreateSectionForm] = useState(false);
 
   const [dictionaryToDelete, setDictionaryToDelete] =
     useState<Dictionary | null>(null);
@@ -92,6 +103,21 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     };
     setDictionaries((prev) => [...prev, newDictionary]);
     setShowCreateDictionaryForm(false);
+  };
+
+  const handleCreateSectionFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+    sectionFormData: SectionFormData
+  ) => {
+    event.preventDefault();
+    const response = await createSection(sectionFormData);
+    const newSection = {
+      id: response.id,
+      name: response.name,
+      dictionary_id: response.dictionary_id,
+    };
+    setSections((prev) => [...prev, newSection]);
+    setShowCreateSectionForm(false);
   };
 
   const handleEditDictionaryFormSubmit = async (
@@ -132,6 +158,10 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setShowCreateDictionaryForm(false);
   };
 
+  const handleCreateSectionFormClose = () => {
+    setShowCreateSectionForm(false);
+  };
+
   const handleEditDictionaryFormClose = () => {
     setShowEditDictionaryForm(false);
     setDictionaryToEdit(null);
@@ -150,6 +180,16 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     }
 
     setUserId(parseInt(user_id, 10));
+  };
+
+  const handleAddSectionClick = () => {
+    setShowCreateSectionForm(true);
+    if (!currentDictionary) {
+      console.error("Current dictionary is null.");
+      return;
+    } else {
+      setDictionaryId(currentDictionary.id);
+    }
   };
 
   const handleEditDictionaryClick = (dictionary: Dictionary) => {
@@ -221,67 +261,81 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     );
 
     return (
-      <ModalContent>
-        <ModalSubTitle>{currentDictionary.name}</ModalSubTitle>
-        {sections.map((section: Section) => {
-          const entries = userData.entries.filter(
-            (entry) => entry.section_id === section.id
-          );
+      <>
+        <ModalContent>
+          <ModalSubTitle>{currentDictionary.name}</ModalSubTitle>
+          {sections.map((section: Section) => {
+            const entries = userData.entries.filter(
+              (entry) => entry.section_id === section.id
+            );
 
-          return (
-            <div key={section.id}>
-              <ModalActions style={{ paddingTop: "3vh" }}>
-                <ModalSubTitle>{section.name}</ModalSubTitle>
-                <div>
-                  <Button>Edit</Button>
-                  <Button>Delete</Button>
-                </div>
-              </ModalActions>
-              <KeyMappingsTable>
-                <thead>
-                  <KeyMappingsHeaderRow>
-                    <TableCell width="20%" style={{ textAlign: "center" }}>
-                      Keymap
-                    </TableCell>
-                    <TableCell width="30%" style={{ textAlign: "center" }}>
-                      Description
-                    </TableCell>
-                    <TableCell width="50%" />
-                  </KeyMappingsHeaderRow>
-                </thead>
-                <tbody>
-                  {entries.map((entry: KeyMapping) => (
-                    <KeyMappingsRow key={`${entry.keymap}-${entry.mode}`}>
-                      <TableCell width="20%">{entry.keymap}</TableCell>
-                      <TableCell width="30%">{entry.description}</TableCell>
-                      <TableCell>
-                        <Button>Edit</Button>
-                        <Button>Delete</Button>
+            return (
+              <div key={section.id}>
+                <ModalActions style={{ paddingTop: "3vh" }}>
+                  <ModalSubTitle>{section.name}</ModalSubTitle>
+                  <div>
+                    <Button>Edit</Button>
+                    <Button>Delete</Button>
+                  </div>
+                </ModalActions>
+                <KeyMappingsTable>
+                  <thead>
+                    <KeyMappingsHeaderRow>
+                      <TableCell width="20%" style={{ textAlign: "center" }}>
+                        Keymap
                       </TableCell>
-                    </KeyMappingsRow>
-                  ))}
-                  <tr>
-                    <td
-                      colSpan={3}
-                      style={{ display: "flex", alignItems: "center" }}
-                    >
-                      <AddButton>+</AddButton>
-                      <span style={{ marginLeft: "10px" }}>Add Entry</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </KeyMappingsTable>
-            </div>
-          );
-        })}
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <AddButton style={{ marginTop: "3vh" }}>+</AddButton>
-          <span style={{ marginLeft: "10px" }}>Add Section</span>
-        </div>
-        <BackButton onClick={() => setCurrentDictionary(null)}>
-          <FontAwesomeIcon icon={faArrowLeft} size={"2x"} />
-        </BackButton>
-      </ModalContent>
+                      <TableCell width="30%" style={{ textAlign: "center" }}>
+                        Description
+                      </TableCell>
+                      <TableCell width="50%" />
+                    </KeyMappingsHeaderRow>
+                  </thead>
+                  <tbody>
+                    {entries.map((entry: KeyMapping) => (
+                      <KeyMappingsRow key={`${entry.keymap}-${entry.mode}`}>
+                        <TableCell width="20%">{entry.keymap}</TableCell>
+                        <TableCell width="30%">{entry.description}</TableCell>
+                        <TableCell>
+                          <Button>Edit</Button>
+                          <Button>Delete</Button>
+                        </TableCell>
+                      </KeyMappingsRow>
+                    ))}
+                    <tr>
+                      <td
+                        colSpan={3}
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <AddButton>+</AddButton>
+                        <span style={{ marginLeft: "10px" }}>Add Entry</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </KeyMappingsTable>
+              </div>
+            );
+          })}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <AddButton
+              onClick={handleAddSectionClick}
+              style={{ marginTop: "3vh" }}
+            >
+              +
+            </AddButton>
+            <span style={{ marginLeft: "10px" }}>Add Section</span>
+          </div>
+          <BackButton onClick={() => setCurrentDictionary(null)}>
+            <FontAwesomeIcon icon={faArrowLeft} size={"2x"} />
+          </BackButton>
+        </ModalContent>
+        {showCreateSectionForm && (
+          <AddSectionPrompt
+            dictionary_id={dictionaryId}
+            onClose={handleCreateSectionFormClose}
+            onSubmit={handleCreateSectionFormSubmit}
+          />
+        )}
+      </>
     );
   };
 
