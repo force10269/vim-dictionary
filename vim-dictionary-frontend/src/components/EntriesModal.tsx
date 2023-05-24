@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import LoadingOverlay from "./LoadingOverlay";
 import AddDictionaryPrompt from "./AddDictionaryPrompt";
+import EditDictionaryPrompt from "./EditDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
@@ -26,6 +27,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import {
   createDictionary,
+  updateDictionary,
   deleteDictionary,
 } from "@/services/dictionaryService";
 import Cookies from "js-cookie";
@@ -50,6 +52,10 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [dictionaries, setDictionaries] = useState<Dictionary[]>([]);
   const [currentDictionary, setCurrentDictionary] = useState<Dictionary | null>(
+    null
+  );
+  const [showEditDictionaryForm, setShowEditDictionaryForm] = useState(false);
+  const [dictionaryToEdit, setDictionaryToEdit] = useState<Dictionary | null>(
     null
   );
 
@@ -88,6 +94,30 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setShowCreateDictionaryForm(false);
   };
 
+  const handleEditDictionaryFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+    dictionaryFormData: Dictionary
+  ) => {
+    event.preventDefault();
+    const response = await updateDictionary(
+      dictionaryFormData,
+      dictionaryFormData.id
+    );
+    if (response) {
+      setDictionaries(
+        dictionaries.map((dictionary) => {
+          if (dictionary.id === response.id) {
+            return response;
+          }
+
+          return dictionary;
+        })
+      );
+    } else {
+      console.error(`Failed to update dictionary with ID ${response.id}`);
+    }
+  };
+
   const handleDeleteDictionarySubmit = async (id: number) => {
     const success = await deleteDictionary(id);
     if (success) {
@@ -100,6 +130,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const handleCreateDictionaryFormClose = () => {
     setShowCreateDictionaryForm(false);
+  };
+
+  const handleEditDictionaryFormClose = () => {
+    setShowEditDictionaryForm(false);
+    setDictionaryToEdit(null);
   };
 
   const handleDeleteDictionaryClose = () => {
@@ -117,6 +152,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setUserId(parseInt(user_id, 10));
   };
 
+  const handleEditDictionaryClick = (dictionary: Dictionary) => {
+    setDictionaryToEdit(dictionary);
+    setShowEditDictionaryForm(true);
+  };
+
   const renderDictionaries = () => {
     if (!userData) {
       return <></>;
@@ -132,7 +172,9 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                 <Button onClick={() => handleViewDictionary(dictionary)}>
                   View
                 </Button>
-                <Button>Edit</Button>
+                <Button onClick={() => handleEditDictionaryClick(dictionary)}>
+                  Edit
+                </Button>
                 <Button onClick={() => handleDeleteDictionary(dictionary)}>
                   Delete
                 </Button>
@@ -151,7 +193,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             onSubmit={handleCreateDictionaryFormSubmit}
           />
         )}
-
+        {showEditDictionaryForm && dictionaryToEdit && (
+          <EditDictionaryPrompt
+            dictionary={dictionaryToEdit}
+            onClose={handleEditDictionaryFormClose}
+            onSubmit={handleEditDictionaryFormSubmit}
+          />
+        )}
         {dictionaryToDelete && (
           <DeleteDictionaryPrompt
             dictionary={dictionaryToDelete}

@@ -55,4 +55,10 @@ export const Input = styled.input`
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   width: 80%;
+
+  &:focus {
+    outline: none !important;
+    border: 1px solid #719ece;
+    box-shadow: 0 0 10px #719ece;
+  }
 `;
