@@ -115,6 +115,14 @@ export default function Home() {
         return "<Ctrl>";
       case "Alt":
         return "<Alt>";
+      case "Tab":
+        return "<Tab>";
+      case "Delete":
+        return "<Del>";
+      case "Home":
+        return "<Home>";
+      case "End":
+        return "<End>";
       default:
         return key;
     }
@@ -140,13 +148,9 @@ export default function Home() {
 
   const filterKeyMappings = (
     keyMappings: Array<KeyMapping>,
-    searchTerm: string,
-    mode: string
+    searchTerm: string
   ) => {
     return keyMappings.filter((mapping) => {
-      if (!(mapping.mode === mode)) {
-        return false;
-      }
       if (
         searchTerm &&
         !mapping.key.toLowerCase().startsWith(searchTerm.toLowerCase())
@@ -166,6 +170,7 @@ export default function Home() {
       if (
         globalSearch &&
         !(
+          mapping.key.toLowerCase().includes(globalSearch.toLowerCase()) ||
           mapping.description
             .toLowerCase()
             .includes(globalSearch.toLowerCase()) ||
@@ -183,7 +188,7 @@ export default function Home() {
     let result = allMappings;
 
     if (search) {
-      result = filterKeyMappings(result, search, mode);
+      result = filterKeyMappings(result, search);
     }
 
     if (globalSearch) {
@@ -273,12 +278,10 @@ export default function Home() {
       <Terminal>
         <label htmlFor="mode">Mode:</label>
         <ModeSelect id="mode" value={mode} onChange={handleModeChange}>
-          <option value="normal">Normal</option>
-          <option value="visual">Visual</option>
-          <option value="visual">Visual</option>
-          <option value="insert">Insert</option>
-          <option value="command">Command</option>
-          <option value="replace">Replace</option>
+          <option value="Normal">Normal</option>
+          <option value="Visual">Visual</option>
+          <option value="Insert">Insert</option>
+          <option value="Command">Command</option>
         </ModeSelect>
         <label htmlFor="search">Search:</label>
         <SearchRow>

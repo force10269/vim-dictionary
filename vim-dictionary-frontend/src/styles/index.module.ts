@@ -155,11 +155,11 @@ export const TableCell = styled.td`
   padding: 8px;
 
   &:nth-child(1) {
-    width: 12.5%;
+    width: 15%;
   }
 
   &:nth-child(2) {
-    width: 30%;
+    width: 27.5%;
   }
 `;
 
