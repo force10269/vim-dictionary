@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import LoadingOverlay from "./LoadingOverlay";
+import AddDictionaryPrompt from "./AddDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
@@ -45,6 +46,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   onClose,
   userData,
 }) => {
+  const [userId, setUserId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [currentDictionary, setCurrentDictionary] = useState<Dictionary | null>(
     null
@@ -52,8 +54,6 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const [showCreateDictionaryForm, setShowCreateDictionaryForm] =
     useState(false);
-  const [dictionaryFormData, setDictionaryFormData] =
-    useState<DictionaryFormData>({ name: "", user_id: 0 });
 
   const [dictionaryToDelete, setDictionaryToDelete] =
     useState<Dictionary | null>(null);
@@ -66,18 +66,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setDictionaryToDelete(dictionary);
   };
 
-  const handleCreateDictionaryInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, value } = event.target;
-    setDictionaryFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleCreateDictionaryFormSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
+    dictionaryFormData: DictionaryFormData
   ) => {
     event.preventDefault();
     await createDictionary(dictionaryFormData);
+    // TODO: add the created dictionary to the view
     setShowCreateDictionaryForm(false);
   };
 
@@ -107,10 +102,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       return;
     }
 
-    setDictionaryFormData({
-      name: "",
-      user_id: parseInt(user_id, 10),
-    });
+    setUserId(parseInt(user_id, 10));
   };
 
   const renderDictionaries = () => {
@@ -141,29 +133,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
           <span style={{ marginLeft: "10px" }}>Add Dictionary</span>
         </div>
         {showCreateDictionaryForm && (
-          <div>
-            <form
-              className={styles.modalForm}
-              onSubmit={handleCreateDictionaryFormSubmit}
-              style={{ marginTop: "20px" }}
-            >
-              <Button
-                onClick={handleCreateDictionaryFormClose}
-                style={{ width: "5vw" }}
-              >
-                <FontAwesomeIcon icon={faArrowLeft} size={"1x"} />
-              </Button>
-              <label htmlFor="name">Dictionary Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={dictionaryFormData.name}
-                onChange={handleCreateDictionaryInputChange}
-              />
-              <button type="submit">Create Dictionary</button>
-            </form>
-          </div>
+          <AddDictionaryPrompt
+            user_id={userId}
+            onClose={handleCreateDictionaryFormClose}
+            onSubmit={handleCreateDictionaryFormSubmit}
+          />
         )}
 
         {dictionaryToDelete && (

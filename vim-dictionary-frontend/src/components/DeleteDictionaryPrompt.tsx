@@ -40,7 +40,7 @@ const DeleteDictionaryPrompt: React.FC<DeleteDictionaryPromptProps> = ({
           In order to delete this dictionary, please type in the name of the
           dictionary:
           <br />
-          {dictionary.name}
+          <strong>{dictionary.name}</strong>
         </h2>
         <form onSubmit={handleSubmit}>
           <Input type="text" value={name} onChange={handleChange} />
