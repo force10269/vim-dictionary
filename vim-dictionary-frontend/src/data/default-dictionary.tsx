@@ -1324,4 +1324,24 @@ export const keyMappings = [
     mode: "EX commands",
     description: 'repeat last ":substitute"',
   },
+  {
+    key: ":w",
+    mode: "EX commands",
+    description: "write to buffer/save",
+  },
+  {
+    key: ":wq",
+    mode: "EX commands",
+    description: "write to buffer and quit/save and quit",
+  },
+  {
+    key: ":q",
+    mode: "EX commands",
+    description: "exit window, quit",
+  },
+  {
+    key: ":wq",
+    mode: "EX commands",
+    description: "exit window by force, force quit",
+  },
 ];

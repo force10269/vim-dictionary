@@ -70,6 +70,12 @@ export const GlobalSearchInput = styled.input`
   font-size: 1.2rem;
   padding: 0.5rem;
   width: 40%;
+
+  &:focus {
+    outline: none !important;
+    border: 1px solid #719ece;
+    box-shadow: 0 0 10px #719ece;
+  }
 `;
 
 export const SearchRow = styled.div`
@@ -110,6 +116,12 @@ export const SearchInput = styled.input`
   font-size: 1.2rem;
   padding: 0.5rem;
   width: 100%;
+
+  &:focus {
+    outline: none !important;
+    border: 1px solid #719ece;
+    box-shadow: 0 0 10px #719ece;
+  }
 `;
 
 export const ModeSelect = styled.select`

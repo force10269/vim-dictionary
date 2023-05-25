@@ -154,37 +154,25 @@ export default function Home() {
     keyMappings: Array<KeyMapping>,
     searchTerm: string
   ) => {
-    return keyMappings.filter((mapping) => {
-      if (
-        searchTerm &&
-        !mapping.key.toLowerCase().startsWith(searchTerm.toLowerCase())
-      ) {
-        return false;
-      }
-
-      return true;
-    });
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return keyMappings.filter((mapping) =>
+      mapping.key.toLowerCase().startsWith(lowerSearchTerm)
+    );
   };
 
   const filterGlobalSearch = (
     keyMappings: Array<KeyMapping>,
     globalSearch: string
   ) => {
+    const lowerGlobalSearch = globalSearch.toLowerCase();
     return keyMappings.filter((mapping) => {
-      if (
-        globalSearch &&
-        !(
-          mapping.key.toLowerCase().includes(globalSearch.toLowerCase()) ||
-          mapping.description
-            .toLowerCase()
-            .includes(globalSearch.toLowerCase()) ||
-          mapping.section?.toLowerCase().includes(globalSearch.toLowerCase()) ||
-          mapping.dictionary?.toLowerCase().includes(globalSearch.toLowerCase())
-        )
-      ) {
-        return false;
-      }
-      return true;
+      const consolidatedMapping = (
+        mapping.key +
+        mapping.description +
+        (mapping.section || "") +
+        (mapping.dictionary || "")
+      ).toLowerCase();
+      return consolidatedMapping.includes(lowerGlobalSearch);
     });
   };
 
