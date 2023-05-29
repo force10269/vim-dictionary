@@ -5,6 +5,7 @@ import EditDictionaryPrompt from "./EditDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import AddSectionPrompt from "./AddSectionPrompt";
 import DeleteSectionPrompt from "./DeleteSectionPrompt";
+import AddEntryPrompt from "./AddEntryPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
   Dictionary,
@@ -37,6 +38,7 @@ import {
   updateSection,
   deleteSection,
 } from "@/services/sectionService";
+import { createEntry, updateEntry, deleteEntry } from "@/services/entryService";
 import Cookies from "js-cookie";
 
 interface EntriesModalProps {
@@ -55,6 +57,13 @@ interface SectionFormData {
   dictionary_id: number;
 }
 
+interface EntryFormData {
+  keymap: string;
+  description: string;
+  mode: string;
+  section_id: number;
+}
+
 const EntriesModal: React.FC<EntriesModalProps> = ({
   show,
   onClose,
@@ -62,12 +71,15 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 }) => {
   const [userId, setUserId] = useState(0);
   const [dictionaryId, setDictionaryId] = useState(0);
+  const [sectionId, setSectionId] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dictionaries, setDictionaries] = useState<Dictionary[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
+  const [entries, setEntries] = useState<KeyMapping[]>([]);
   const [currentDictionary, setCurrentDictionary] = useState<Dictionary | null>(
     null
   );
+  const [currentSection, setCurrentSection] = useState<Section | null>(null);
   const [showEditDictionaryForm, setShowEditDictionaryForm] = useState(false);
   const [dictionaryToEdit, setDictionaryToEdit] = useState<Dictionary | null>(
     null
@@ -77,6 +89,8 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const [showCreateSectionForm, setShowCreateSectionForm] = useState(false);
   const [showDeleteSectionForm, setShowDeleteSectionForm] = useState(false);
+
+  const [showCreateEntryForm, setShowCreateEntryForm] = useState(false);
 
   const [sectionToDelete, setSectionToDelete] = useState<Section | null>(null);
 
@@ -99,6 +113,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     if (userData) {
       setDictionaries(userData.dictionaries);
       setSections(userData.sections);
+      setEntries(userData.entries);
     }
   }, [userData]);
 
@@ -130,6 +145,23 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     };
     setSections((prev) => [...prev, newSection]);
     setShowCreateSectionForm(false);
+  };
+
+  const handleCreateEntryFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+    entryFormData: EntryFormData
+  ) => {
+    event.preventDefault();
+    const response = await createEntry(entryFormData);
+    const newEntry = {
+      id: response.id,
+      keymap: response.keymap,
+      description: response.description,
+      mode: response.mode,
+      section_id: response.section_id,
+    };
+    setEntries((prev) => [...prev, newEntry]);
+    setShowCreateEntryForm(false);
   };
 
   const handleEditDictionaryFormSubmit = async (
@@ -184,6 +216,10 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setShowCreateSectionForm(false);
   };
 
+  const handleCreateEntryFormClose = () => {
+    setShowCreateEntryForm(false);
+  };
+
   const handleEditDictionaryFormClose = () => {
     setShowEditDictionaryForm(false);
     setDictionaryToEdit(null);
@@ -216,6 +252,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     } else {
       setDictionaryId(currentDictionary.id);
     }
+  };
+
+  const handleAddEntryClick = (section: Section) => {
+    setShowCreateEntryForm(true);
+    setSectionId(section.id);
   };
 
   const handleEditDictionaryClick = (dictionary: Dictionary) => {
@@ -291,7 +332,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
         <ModalContent>
           <ModalSubTitle>{currentDictionary.name}</ModalSubTitle>
           {currSections.map((section: Section) => {
-            const entries = userData.entries.filter(
+            const currEntries = entries.filter(
               (entry) => entry.section_id === section.id
             );
 
@@ -319,7 +360,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                     </KeyMappingsHeaderRow>
                   </thead>
                   <tbody>
-                    {entries.map((entry: KeyMapping) => (
+                    {currEntries.map((entry: KeyMapping) => (
                       <KeyMappingsRow key={`${entry.keymap}-${entry.mode}`}>
                         <TableCell width="20%">{entry.keymap}</TableCell>
                         <TableCell width="30%">{entry.description}</TableCell>
@@ -334,7 +375,9 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                         colSpan={3}
                         style={{ display: "flex", alignItems: "center" }}
                       >
-                        <AddButton>+</AddButton>
+                        <AddButton onClick={() => handleAddEntryClick(section)}>
+                          +
+                        </AddButton>
                         <span style={{ marginLeft: "10px" }}>Add Entry</span>
                       </td>
                     </tr>
@@ -368,6 +411,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             section={sectionToDelete}
             onClose={handleDeleteSectionClose}
             onSubmit={handleDeleteSectionSubmit}
+          />
+        )}
+        {showCreateEntryForm && (
+          <AddEntryPrompt
+            section_id={sectionId}
+            onClose={handleCreateEntryFormClose}
+            onSubmit={handleCreateEntryFormSubmit}
           />
         )}
       </>
