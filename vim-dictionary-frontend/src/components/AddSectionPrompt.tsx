@@ -40,9 +40,7 @@ const AddSectionPrompt: React.FC<AddSectionPromptProps> = ({
     event.preventDefault();
 
     if (!sectionFormData.name || sectionFormData.name.length < 3) {
-      alert(
-        "Please enter a valid dictionary name (at least 3 characters long)."
-      );
+      alert("Please enter a valid section name (at least 3 characters long).");
       return;
     }
 
@@ -50,8 +48,8 @@ const AddSectionPrompt: React.FC<AddSectionPromptProps> = ({
       onSubmit(event, sectionFormData);
       onClose();
     } catch (err) {
-      console.error("Failed to create dictionary", err);
-      alert("Failed to create dictionary. Please try again later.");
+      console.error("Failed to create section", err);
+      alert("Failed to create section. Please try again later.");
     }
   };
 
