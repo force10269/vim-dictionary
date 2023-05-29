@@ -6,6 +6,7 @@ import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import AddSectionPrompt from "./AddSectionPrompt";
 import DeleteSectionPrompt from "./DeleteSectionPrompt";
 import AddEntryPrompt from "./AddEntryPrompt";
+import DeleteEntryPrompt from "./DeleteEntryPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
   Dictionary,
@@ -93,6 +94,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const [showCreateEntryForm, setShowCreateEntryForm] = useState(false);
 
   const [sectionToDelete, setSectionToDelete] = useState<Section | null>(null);
+  const [entryToDelete, setEntryToDelete] = useState<KeyMapping | null>(null);
 
   const [dictionaryToDelete, setDictionaryToDelete] =
     useState<Dictionary | null>(null);
@@ -107,6 +109,10 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const handleDeleteSection = (section: Section) => {
     setSectionToDelete(section);
+  };
+
+  const handleDeleteEntry = (entry: KeyMapping) => {
+    setEntryToDelete(entry);
   };
 
   useEffect(() => {
@@ -204,7 +210,17 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       setSections((prev) => prev.filter((sect) => sect.id !== id));
       setSectionToDelete(null);
     } else {
-      console.error(`Failed to delete dictionary with ID ${id}`);
+      console.error(`Failed to delete section with ID ${id}`);
+    }
+  };
+
+  const handleDeleteEntrySubmit = async (id: number) => {
+    const success = await deleteEntry(id);
+    if (success) {
+      setEntries((prev) => prev.filter((ent) => ent.id !== id));
+      setEntryToDelete(null);
+    } else {
+      console.error(`Failed to delete entry with ID ${id}`);
     }
   };
 
@@ -231,6 +247,10 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const handleDeleteSectionClose = () => {
     setSectionToDelete(null);
+  };
+
+  const handleDeleteEntryClose = () => {
+    setEntryToDelete(null);
   };
 
   const handleAddDictionaryClick = () => {
@@ -366,7 +386,9 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                         <TableCell width="30%">{entry.description}</TableCell>
                         <TableCell>
                           <Button>Edit</Button>
-                          <Button>Delete</Button>
+                          <Button onClick={() => handleDeleteEntry(entry)}>
+                            Delete
+                          </Button>
                         </TableCell>
                       </KeyMappingsRow>
                     ))}
@@ -411,6 +433,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             section={sectionToDelete}
             onClose={handleDeleteSectionClose}
             onSubmit={handleDeleteSectionSubmit}
+          />
+        )}
+        {entryToDelete && (
+          <DeleteEntryPrompt
+            entry={entryToDelete}
+            onClose={handleDeleteEntryClose}
+            onSubmit={handleDeleteEntrySubmit}
           />
         )}
         {showCreateEntryForm && (
