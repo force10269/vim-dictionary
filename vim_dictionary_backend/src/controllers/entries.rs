@@ -53,7 +53,7 @@ async fn create_entry(
     entry: web::Json<NewEntry>,
 ) -> impl Responder {
     let result = sqlx::query(
-        "INSERT INTO entries (keymap, description, mode, section_id) VALUES ($1, $2, $3, $4) RETURNING keymap, description, mode, section_id",
+        "INSERT INTO entries (keymap, description, mode, section_id) VALUES ($1, $2, $3, $4) RETURNING id, keymap, description, mode, section_id",
     )
     .bind(&entry.keymap)
     .bind(&entry.description)
