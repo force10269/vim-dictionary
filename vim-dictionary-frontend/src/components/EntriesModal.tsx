@@ -4,6 +4,7 @@ import AddDictionaryPrompt from "./AddDictionaryPrompt";
 import EditDictionaryPrompt from "./EditDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import AddSectionPrompt from "./AddSectionPrompt";
+import DeleteSectionPrompt from "./DeleteSectionPrompt";
 import styles from "@/styles/Modal.module.css";
 import {
   Dictionary,
@@ -31,7 +32,11 @@ import {
   updateDictionary,
   deleteDictionary,
 } from "@/services/dictionaryService";
-import { createSection } from "@/services/sectionService";
+import {
+  createSection,
+  updateSection,
+  deleteSection,
+} from "@/services/sectionService";
 import Cookies from "js-cookie";
 
 interface EntriesModalProps {
@@ -67,17 +72,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const [dictionaryToEdit, setDictionaryToEdit] = useState<Dictionary | null>(
     null
   );
-
-  useEffect(() => {
-    if (userData) {
-      setDictionaries(userData.dictionaries);
-    }
-  }, [userData]);
-
   const [showCreateDictionaryForm, setShowCreateDictionaryForm] =
     useState(false);
 
   const [showCreateSectionForm, setShowCreateSectionForm] = useState(false);
+  const [showDeleteSectionForm, setShowDeleteSectionForm] = useState(false);
+
+  const [sectionToDelete, setSectionToDelete] = useState<Section | null>(null);
 
   const [dictionaryToDelete, setDictionaryToDelete] =
     useState<Dictionary | null>(null);
@@ -89,6 +90,17 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const handleDeleteDictionary = (dictionary: Dictionary) => {
     setDictionaryToDelete(dictionary);
   };
+
+  const handleDeleteSection = (section: Section) => {
+    setSectionToDelete(section);
+  };
+
+  useEffect(() => {
+    if (userData) {
+      setDictionaries(userData.dictionaries);
+      setSections(userData.sections);
+    }
+  }, [userData]);
 
   const handleCreateDictionaryFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -154,6 +166,16 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     }
   };
 
+  const handleDeleteSectionSubmit = async (id: number) => {
+    const success = await deleteSection(id);
+    if (success) {
+      setSections((prev) => prev.filter((sect) => sect.id !== id));
+      setSectionToDelete(null);
+    } else {
+      console.error(`Failed to delete dictionary with ID ${id}`);
+    }
+  };
+
   const handleCreateDictionaryFormClose = () => {
     setShowCreateDictionaryForm(false);
   };
@@ -169,6 +191,10 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const handleDeleteDictionaryClose = () => {
     setDictionaryToDelete(null);
+  };
+
+  const handleDeleteSectionClose = () => {
+    setSectionToDelete(null);
   };
 
   const handleAddDictionaryClick = () => {
@@ -256,7 +282,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       return <></>;
     }
 
-    const sections = userData.sections.filter(
+    const currSections = sections.filter(
       (section) => section.dictionary_id === currentDictionary.id
     );
 
@@ -264,7 +290,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       <>
         <ModalContent>
           <ModalSubTitle>{currentDictionary.name}</ModalSubTitle>
-          {sections.map((section: Section) => {
+          {currSections.map((section: Section) => {
             const entries = userData.entries.filter(
               (entry) => entry.section_id === section.id
             );
@@ -275,7 +301,9 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                   <ModalSubTitle>{section.name}</ModalSubTitle>
                   <div>
                     <Button>Edit</Button>
-                    <Button>Delete</Button>
+                    <Button onClick={() => handleDeleteSection(section)}>
+                      Delete
+                    </Button>
                   </div>
                 </ModalActions>
                 <KeyMappingsTable>
@@ -333,6 +361,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             dictionary_id={dictionaryId}
             onClose={handleCreateSectionFormClose}
             onSubmit={handleCreateSectionFormSubmit}
+          />
+        )}
+        {sectionToDelete && (
+          <DeleteSectionPrompt
+            section={sectionToDelete}
+            onClose={handleDeleteSectionClose}
+            onSubmit={handleDeleteSectionSubmit}
           />
         )}
       </>
