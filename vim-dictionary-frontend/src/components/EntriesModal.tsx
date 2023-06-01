@@ -4,6 +4,7 @@ import AddDictionaryPrompt from "./AddDictionaryPrompt";
 import EditDictionaryPrompt from "./EditDictionaryPrompt";
 import DeleteDictionaryPrompt from "./DeleteDictionaryPrompt";
 import AddSectionPrompt from "./AddSectionPrompt";
+import EditSectionPrompt from "./EditSectionPrompt";
 import DeleteSectionPrompt from "./DeleteSectionPrompt";
 import AddEntryPrompt from "./AddEntryPrompt";
 import DeleteEntryPrompt from "./DeleteEntryPrompt";
@@ -81,9 +82,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   );
   const [currentSection, setCurrentSection] = useState<Section | null>(null);
   const [showEditDictionaryForm, setShowEditDictionaryForm] = useState(false);
+  const [showEditSectionForm, setShowEditSectionForm] = useState(false);
   const [dictionaryToEdit, setDictionaryToEdit] = useState<Dictionary | null>(
     null
   );
+  const [sectionToEdit, setSectionToEdit] = useState<Section | null>(null);
   const [showCreateDictionaryForm, setShowCreateDictionaryForm] =
     useState(false);
 
@@ -219,6 +222,31 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     }
   };
 
+  const handleEditSectionFormSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+    sectionFormData: Section
+  ) => {
+    event.preventDefault();
+    const response = await updateSection(sectionFormData, sectionFormData.id);
+    if (response) {
+      setUserData((prevUserData) => {
+        if (prevUserData && prevUserData.sections) {
+          return {
+            ...prevUserData,
+            sections: prevUserData.sections.map((section) => {
+              if (section.id === response.id) {
+                return response;
+              }
+
+              return section;
+            }),
+          };
+        }
+        return prevUserData;
+      });
+    }
+  };
+
   const handleDeleteDictionarySubmit = async (id: number) => {
     const success = await deleteDictionary(id);
     if (success) {
@@ -293,6 +321,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setDictionaryToEdit(null);
   };
 
+  const handleEditSectionFormClose = () => {
+    setShowEditSectionForm(false);
+    setSectionToEdit(null);
+  };
+
   const handleDeleteDictionaryClose = () => {
     setDictionaryToDelete(null);
   };
@@ -334,6 +367,11 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const handleEditDictionaryClick = (dictionary: Dictionary) => {
     setDictionaryToEdit(dictionary);
     setShowEditDictionaryForm(true);
+  };
+
+  const handleEditSectionClick = (section: Section) => {
+    setSectionToEdit(section);
+    setShowEditSectionForm(true);
   };
 
   const renderDictionaries = () => {
@@ -413,7 +451,9 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
                 <ModalActions style={{ paddingTop: "3vh" }}>
                   <ModalSubTitle>{section.name}</ModalSubTitle>
                   <div>
-                    <Button>Edit</Button>
+                    <Button onClick={() => handleEditSectionClick(section)}>
+                      Edit
+                    </Button>
                     <Button onClick={() => handleDeleteSection(section)}>
                       Delete
                     </Button>
@@ -478,6 +518,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
             dictionary_id={dictionaryId}
             onClose={handleCreateSectionFormClose}
             onSubmit={handleCreateSectionFormSubmit}
+          />
+        )}
+        {showEditSectionForm && sectionToEdit && (
+          <EditSectionPrompt
+            section={sectionToEdit}
+            onClose={handleEditSectionFormClose}
+            onSubmit={handleEditSectionFormSubmit}
           />
         )}
         {sectionToDelete && (
