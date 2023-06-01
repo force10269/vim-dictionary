@@ -84,7 +84,7 @@ async fn update_entry(
     entry: web::Json<Entry>,
 ) -> impl Responder {
     let result = sqlx::query(
-        "UPDATE entries SET keymap = $1, description = $2, mode = $3, section_id = $4 WHERE id = $5 RETURNING keymap, description, mode, section_id",
+        "UPDATE entries SET keymap = $1, description = $2, mode = $3, section_id = $4 WHERE id = $5 RETURNING id, keymap, description, mode, section_id",
     )
     .bind(&entry.keymap)
     .bind(&entry.description)
