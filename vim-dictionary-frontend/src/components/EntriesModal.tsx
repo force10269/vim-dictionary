@@ -414,7 +414,21 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
   const renderDictionaries = () => {
     if (!userData) {
-      return <></>;
+      return (
+        <>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <AddButton onClick={handleAddDictionaryClick}>+</AddButton>
+            <span style={{ marginLeft: "10px" }}>Add Dictionary</span>
+          </div>
+          {showCreateDictionaryForm && (
+            <AddDictionaryPrompt
+              user_id={userId}
+              onClose={handleCreateDictionaryFormClose}
+              onSubmit={handleCreateDictionaryFormSubmit}
+            />
+          )}
+        </>
+      );
     }
 
     return (
