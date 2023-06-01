@@ -56,29 +56,8 @@ export default function Home() {
       if (isValid) {
         const userId = Cookies.get("user_id");
         if (typeof userId === "string") {
-          const userData = await getUserData(userId);
-
-          // Combine user data with key mappings
-          const userMappings = userData.entries.map((entry) => {
-            const section = userData.sections.find(
-              (section) => section.id === entry.section_id
-            );
-            const dictionary = section
-              ? userData.dictionaries.find(
-                  (dict) => dict.id === section.dictionary_id
-                )
-              : null;
-
-            return {
-              key: entry.keymap,
-              mode: entry.mode,
-              description: entry.description,
-              section: section ? section.name : "",
-              dictionary: dictionary ? dictionary.name : "",
-            };
-          }) as KeyMapping[];
-          setKeyMappingData(userMappings);
-          setUserData(userData);
+          const userDataFromServer = await getUserData(userId);
+          setUserData(userDataFromServer);
           setLoggedIn(true);
         }
       } else {
@@ -86,8 +65,34 @@ export default function Home() {
       }
       setLoading(false);
     };
+
     checkToken();
   }, [loggedIn]);
+
+  useEffect(() => {
+    if (userData) {
+      const userMappings = userData.entries.map((entry) => {
+        const section = userData.sections.find(
+          (section) => section.id === entry.section_id
+        );
+        const dictionary = section
+          ? userData.dictionaries.find(
+              (dict) => dict.id === section.dictionary_id
+            )
+          : null;
+
+        return {
+          key: entry.keymap,
+          mode: entry.mode,
+          description: entry.description,
+          section: section ? section.name : "",
+          dictionary: dictionary ? dictionary.name : "",
+        };
+      }) as KeyMapping[];
+
+      setKeyMappingData(userMappings);
+    }
+  }, [userData]);
 
   const allMappings = [...keyMappings, ...keyMappingData];
 
@@ -262,6 +267,7 @@ export default function Home() {
               show={entriesModalVisible}
               onClose={() => setEntriesModalVisible(false)}
               userData={userData}
+              setUserData={setUserData}
             />
           </>
         )}

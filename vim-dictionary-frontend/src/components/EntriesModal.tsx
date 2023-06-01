@@ -46,6 +46,7 @@ interface EntriesModalProps {
   show: boolean;
   onClose: () => void;
   userData: UserData | null;
+  setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
 }
 
 interface DictionaryFormData {
@@ -69,14 +70,12 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   show,
   onClose,
   userData,
+  setUserData,
 }) => {
   const [userId, setUserId] = useState(0);
   const [dictionaryId, setDictionaryId] = useState(0);
   const [sectionId, setSectionId] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [dictionaries, setDictionaries] = useState<Dictionary[]>([]);
-  const [sections, setSections] = useState<Section[]>([]);
-  const [entries, setEntries] = useState<KeyMapping[]>([]);
   const [currentDictionary, setCurrentDictionary] = useState<Dictionary | null>(
     null
   );
@@ -115,14 +114,6 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     setEntryToDelete(entry);
   };
 
-  useEffect(() => {
-    if (userData) {
-      setDictionaries(userData.dictionaries);
-      setSections(userData.sections);
-      setEntries(userData.entries);
-    }
-  }, [userData]);
-
   const handleCreateDictionaryFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>,
     dictionaryFormData: DictionaryFormData
@@ -134,7 +125,16 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       name: response.name,
       user_id: response.user_id,
     };
-    setDictionaries((prev) => [...prev, newDictionary]);
+    setUserData((prevUserData) => {
+      if (prevUserData && prevUserData.dictionaries) {
+        return {
+          ...prevUserData,
+          dictionaries: [...prevUserData.dictionaries, newDictionary],
+        };
+      }
+
+      return prevUserData;
+    });
     setShowCreateDictionaryForm(false);
   };
 
@@ -149,7 +149,16 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       name: response.name,
       dictionary_id: response.dictionary_id,
     };
-    setSections((prev) => [...prev, newSection]);
+    setUserData((prevUserData) => {
+      if (prevUserData && prevUserData.sections) {
+        return {
+          ...prevUserData,
+          sections: [...prevUserData.sections, newSection],
+        };
+      }
+
+      return prevUserData;
+    });
     setShowCreateSectionForm(false);
   };
 
@@ -166,7 +175,17 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       mode: response.mode,
       section_id: response.section_id,
     };
-    setEntries((prev) => [...prev, newEntry]);
+    setUserData((prevUserData) => {
+      if (prevUserData && prevUserData.entries) {
+        return {
+          ...prevUserData,
+          entries: [...prevUserData.entries, newEntry],
+        };
+      }
+
+      return prevUserData;
+    });
+
     setShowCreateEntryForm(false);
   };
 
@@ -180,15 +199,21 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       dictionaryFormData.id
     );
     if (response) {
-      setDictionaries(
-        dictionaries.map((dictionary) => {
-          if (dictionary.id === response.id) {
-            return response;
-          }
+      setUserData((prevUserData) => {
+        if (prevUserData && prevUserData.dictionaries) {
+          return {
+            ...prevUserData,
+            dictionaries: prevUserData.dictionaries.map((dictionary) => {
+              if (dictionary.id === response.id) {
+                return response;
+              }
 
-          return dictionary;
-        })
-      );
+              return dictionary;
+            }),
+          };
+        }
+        return prevUserData;
+      });
     } else {
       console.error(`Failed to update dictionary with ID ${response.id}`);
     }
@@ -197,7 +222,17 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const handleDeleteDictionarySubmit = async (id: number) => {
     const success = await deleteDictionary(id);
     if (success) {
-      setDictionaries((prev) => prev.filter((dict) => dict.id !== id));
+      setUserData((prevUserData) => {
+        if (prevUserData && prevUserData.dictionaries) {
+          return {
+            ...prevUserData,
+            dictionaries: prevUserData.dictionaries.filter(
+              (dict) => dict.id !== id
+            ),
+          };
+        }
+        return prevUserData;
+      });
       setDictionaryToDelete(null);
     } else {
       console.error(`Failed to delete dictionary with ID ${id}`);
@@ -207,7 +242,15 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const handleDeleteSectionSubmit = async (id: number) => {
     const success = await deleteSection(id);
     if (success) {
-      setSections((prev) => prev.filter((sect) => sect.id !== id));
+      setUserData((prevUserData) => {
+        if (prevUserData && prevUserData.sections) {
+          return {
+            ...prevUserData,
+            sections: prevUserData.sections.filter((dict) => dict.id !== id),
+          };
+        }
+        return prevUserData;
+      });
       setSectionToDelete(null);
     } else {
       console.error(`Failed to delete section with ID ${id}`);
@@ -217,7 +260,16 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
   const handleDeleteEntrySubmit = async (id: number) => {
     const success = await deleteEntry(id);
     if (success) {
-      setEntries((prev) => prev.filter((ent) => ent.id !== id));
+      setUserData((prevUserData) => {
+        if (prevUserData && prevUserData.entries) {
+          return {
+            ...prevUserData,
+            entries: prevUserData.entries.filter((dict) => dict.id !== id),
+          };
+        }
+        return prevUserData;
+      });
+
       setEntryToDelete(null);
     } else {
       console.error(`Failed to delete entry with ID ${id}`);
@@ -291,7 +343,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
 
     return (
       <>
-        {dictionaries.map((dictionary) => (
+        {userData.dictionaries.map((dictionary) => (
           <ModalContent key={dictionary.id}>
             <ModalActions>
               <ModalSubTitle>{dictionary.name}</ModalSubTitle>
@@ -343,7 +395,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
       return <></>;
     }
 
-    const currSections = sections.filter(
+    const currSections = userData.sections.filter(
       (section) => section.dictionary_id === currentDictionary.id
     );
 
@@ -352,7 +404,7 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
         <ModalContent>
           <ModalSubTitle>{currentDictionary.name}</ModalSubTitle>
           {currSections.map((section: Section) => {
-            const currEntries = entries.filter(
+            const currEntries = userData.entries.filter(
               (entry) => entry.section_id === section.id
             );
 
