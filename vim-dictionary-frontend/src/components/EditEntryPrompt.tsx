@@ -8,43 +8,40 @@ import styles from "@/styles/Modal.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
-import { Section } from "@/services/userService";
+import { KeyMapping } from "@/services/userService";
 
-interface EditSectionPromptProps {
-  section: Section;
+interface EditEntryPromptProps {
+  entry: KeyMapping;
   onClose: () => void;
   onSubmit: (
     event: React.FormEvent<HTMLFormElement>,
-    sectionFormData: Section
+    entryFormData: KeyMapping
   ) => void;
 }
 
-const EditSectionPrompt: React.FC<EditSectionPromptProps> = ({
-  section,
+const EditEntryPrompt: React.FC<EditEntryPromptProps> = ({
+  entry,
   onClose,
   onSubmit,
 }) => {
-  const [sectionFormData, setSectionFormData] = useState<Section>(section);
+  const [entryFormData, setEntryFormData] = useState<KeyMapping>(entry);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    setSectionFormData((prev) => ({ ...prev, [name]: value }));
+    setEntryFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!sectionFormData.name || sectionFormData.name.length < 3) {
-      alert("Please enter a valid section name (at least 3 characters long).");
-      return;
-    }
+    // TODO: Entry edit validation
 
     try {
-      onSubmit(event, sectionFormData);
+      onSubmit(event, entryFormData);
       onClose();
     } catch (err) {
-      console.error("Failed to update section", err);
-      alert("Failed to update section. Please try again later.");
+      console.error("Failed to update entry", err);
+      alert("Failed to update entry. Please try again later.");
     }
   };
 
@@ -60,15 +57,23 @@ const EditSectionPrompt: React.FC<EditSectionPromptProps> = ({
             <Button onClick={onClose} style={{ width: "5vw" }}>
               <FontAwesomeIcon icon={faArrowLeft} size={"1x"} />
             </Button>
-            <label htmlFor="name">Section Name</label>
+            <label htmlFor="keymap">Entry Keymap</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={sectionFormData.name}
+              id="keymap"
+              name="keymap"
+              value={entryFormData.keymap}
               onChange={handleChange}
             />
-            <button type="submit">Update Section</button>
+            <label htmlFor="description">Entry Description</label>
+            <input
+              type="text"
+              id="description"
+              name="description"
+              value={entryFormData.description}
+              onChange={handleChange}
+            />
+            <button type="submit">Update Entry</button>
           </form>
         </div>
       </EditPromptContent>
@@ -76,4 +81,4 @@ const EditSectionPrompt: React.FC<EditSectionPromptProps> = ({
   );
 };
 
-export default EditSectionPrompt;
+export default EditEntryPrompt;
