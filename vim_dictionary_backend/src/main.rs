@@ -1,3 +1,4 @@
+use actix_governor::{Governor, GovernorConfigBuilder};
 use actix_cors::Cors;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
@@ -33,8 +34,16 @@ async fn main() -> std::io::Result<()> {
     let server_address = format!("{}:{}", conf.server_bind, conf.server_port);
     println!("Listening requests on {}", server_address);
 
+    // Configure governor
+    let governor_conf = GovernorConfigBuilder::default()
+        .per_second(2)
+        .burst_size(5)
+        .finish()
+        .unwrap();
+
     HttpServer::new(move || {
         App::new()
+            .wrap(Governor::new(&governor_conf))
             .app_data(web::Data::new(db_pool.clone()))
             .service(
                 web::scope("/api")
