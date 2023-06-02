@@ -1,9 +1,11 @@
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, fireEvent, screen, act } from "@testing-library/react";
 import Home from "@/pages/index";
 
 describe("Home", () => {
-  beforeEach(() => {
-    render(<Home />);
+  beforeEach(async () => {
+    await act(async () => {
+      render(<Home />);
+    });
   });
 
   test("renders Vim Dictionary title", () => {
@@ -11,11 +13,13 @@ describe("Home", () => {
     expect(title).toBeInTheDocument();
   });
 
-  test("renders mode select and changes its value", () => {
+  test("renders mode select and changes its value", async () => {
     const modeSelect = screen.getByLabelText("Mode:");
     expect(modeSelect).toBeInTheDocument();
-    fireEvent.change(modeSelect, { target: { value: "visual" } });
-    expect(modeSelect).toHaveValue("visual");
+    await act(async () => {
+      fireEvent.change(modeSelect, { target: { value: "Visual" } });
+    });
+    expect(modeSelect).toHaveValue("Visual");
   });
 
   test("renders search input and types a key", () => {
@@ -25,7 +29,7 @@ describe("Home", () => {
     expect(searchInput).toHaveValue("a");
   });
 
-  test("renders global search input and types a search term", () => {
+  test("renders global search input and types a search term", async () => {
     const globalSearchInput = screen.getByPlaceholderText("Global search...");
     expect(globalSearchInput).toBeInTheDocument();
     fireEvent.change(globalSearchInput, { target: { value: "delete" } });
