@@ -94,7 +94,7 @@ export default function Home() {
     }
   }, [userData]);
 
-  const allMappings = [...keyMappings, ...keyMappingData];
+  const allMappings = [...keyMappingData, ...keyMappings];
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
