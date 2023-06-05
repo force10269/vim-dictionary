@@ -36,8 +36,8 @@ async fn main() -> std::io::Result<()> {
 
     // Configure governor
     let governor_conf = GovernorConfigBuilder::default()
-        .per_second(2)
-        .burst_size(5)
+        .per_second(25)
+        .burst_size(25)
         .finish()
         .unwrap();
 
