@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import LoadingOverlay from "./LoadingOverlay";
 import styles from "@/styles/Modal.module.css";
 import { registerUser } from "../services/userService";
+import Cookies from "js-cookie";
 
 interface SignupModalProps {
   show: boolean;
@@ -35,11 +36,20 @@ const SignupModal: React.FC<SignupModalProps> = ({
         password: password,
         email: email,
       };
-      const result = await registerUser(registerData);
-      if (!result) {
+      const response = await registerUser(registerData);
+      if (!response.token) {
         setErrorMessage("Error signing up");
         return;
       }
+
+      Cookies.set("token", response.token, {
+        secure: true,
+        sameSite: "Strict",
+      });
+      Cookies.set("user_id", response.user_id.toString(), {
+        secure: true,
+        sameSite: "Strict",
+      });
 
       onSignupSuccess();
       onClose();

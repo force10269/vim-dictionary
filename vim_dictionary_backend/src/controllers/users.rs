@@ -83,17 +83,34 @@ async fn get_user_data(pool: web::Data<PgPool>, user_id: web::Path<i32>) -> impl
 async fn register(pool: web::Data<PgPool>, data: web::Json<RegisterData>) -> impl Responder {
     let password_hash = hash(&data.password, DEFAULT_COST).unwrap();
 
-    let result = sqlx::query(
-        "INSERT INTO users (username, password_hash, email) VALUES ($1, $2, $3) RETURNING id",
+    let result = sqlx::query!(
+        "INSERT INTO users (username, password_hash, email) VALUES ($1, $2, $3) RETURNING id, username",
+        &data.username,
+        &password_hash,
+        &data.email
     )
-    .bind(&data.username)
-    .bind(&password_hash)
-    .bind(&data.email)
     .fetch_one(&**pool)
     .await;
 
     match result {
-        Ok(_) => HttpResponse::Created().finish(),
+        Ok(user) => {
+            let secret_key = env::var("JWT_SECRET").expect("JWT_SECRET must be set");
+            let key = EncodingKey::from_secret(secret_key.as_ref());
+            let expiration = 24 * 3600; // 24 hours
+            let now = chrono::Utc::now().timestamp() as usize;
+            let claims = Claims {
+                sub: user.username,
+                exp: now + expiration,
+            };
+            let token = encode(&Header::default(), &claims, &key).unwrap();
+
+            let response_data = json!({
+                "token": token,
+                "user_id": user.id
+            });
+
+            HttpResponse::Created().json(response_data)
+        },
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }

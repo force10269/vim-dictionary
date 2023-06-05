@@ -43,7 +43,7 @@ export interface UserData {
 export async function registerUser(data: RegisterData) {
   try {
     const response = await axios.post(`${API_BASE_URL}/api/register`, data);
-    return response;
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw error.response.data;
