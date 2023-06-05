@@ -23,6 +23,7 @@ export const Container = styled.div`
 export const Header = styled.header`
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
   height: 10%;
   padding: 1rem;
@@ -32,7 +33,7 @@ export const Header = styled.header`
   top: 0;
   z-index: 1000;
 
-  @media(min-width: 768px) and (max-width: 991px) {
+  @media (min-width: 768px) and (max-width: 991px) {
     height: 12%;
   }
 
@@ -41,7 +42,8 @@ export const Header = styled.header`
   }
 
   @media (min-width: 1200px) {
-    height: 15%; 
+    height: 15%;
+  }
 `;
 
 export const AuthButton = styled.button`
@@ -86,11 +88,21 @@ export const SearchRow = styled.div`
 `;
 
 export const IconLink = styled.a`
+  display: flex;
+  align-items: center;
   color: #f8f8f2;
-  font-size: 1.5rem;
+  font-size: 3vw;
   margin-left: 1rem;
   margin-right: 1rem;
   margin-top: 0.5rem;
+
+  @media (max-width: 600px) {
+    font-size: 5vw;
+  }
+
+  @media (min-width: 1200px) {
+    font-size: 1.5rem;
+  }
 `;
 
 export const Terminal = styled.div`
