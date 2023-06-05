@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import LoadingOverlay from "./LoadingOverlay";
 import AddDictionaryPrompt from "./AddDictionaryPrompt";
 import EditDictionaryPrompt from "./EditDictionaryPrompt";
@@ -125,6 +125,13 @@ const EntriesModal: React.FC<EntriesModalProps> = ({
     dictionaryFormData: DictionaryFormData
   ) => {
     event.preventDefault();
+    if (!userData) {
+      setUserData({
+        dictionaries: [],
+        sections: [],
+        entries: [],
+      });
+    }
     const response = await createDictionary(dictionaryFormData);
     const newDictionary = {
       id: response.id,

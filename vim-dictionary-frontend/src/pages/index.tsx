@@ -48,26 +48,32 @@ export default function Home() {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [entriesModalVisible, setEntriesModalVisible] = useState(false);
   const [keyMappingData, setKeyMappingData] = useState<KeyMapping[]>([]);
+  const [userDataFetched, setUserDataFetched] = useState(false);
 
   useEffect(() => {
-    const checkToken = async () => {
+    const initializeUser = async () => {
       setLoading(true);
       const isValid = await validateToken();
+
       if (isValid) {
         const userId = Cookies.get("user_id");
-        if (typeof userId === "string") {
+        if (typeof userId === "string" && !userDataFetched) {
           const userDataFromServer = await getUserData(userId);
           setUserData(userDataFromServer);
           setLoggedIn(true);
+          setUserDataFetched(true);
         }
       } else {
         Cookies.remove("token");
+        setLoggedIn(false);
+        setUserDataFetched(false);
       }
+
       setLoading(false);
     };
 
-    checkToken();
-  }, [loggedIn]);
+    initializeUser();
+  }, []);
 
   useEffect(() => {
     if (userData) {
