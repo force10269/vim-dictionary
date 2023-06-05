@@ -1,0 +1,16 @@
+version: "3"
+services:
+  vim_dictionary_backend:
+    build:
+      context: ./vim_dictionary_backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./vim_dictionary_backend/.env
+    ports:
+      - "8080:8080"
+  vim_dictionary_frontend:
+    build:
+      context: ./vim-dictionary-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
