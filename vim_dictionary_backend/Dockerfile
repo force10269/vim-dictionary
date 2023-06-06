@@ -1,27 +1,44 @@
-FROM rust:1.69 as planner
-WORKDIR /app
-RUN cargo install cargo-chef
-COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
+FROM rust:latest AS builder
 
-FROM rust:1.69 as cacher
-WORKDIR /app
-RUN cargo install cargo-chef
-COPY --from=planner /app/recipe.json recipe.json
-COPY .env .env
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt update && apt install -y musl-tools musl-dev
+RUN update-ca-certificates
 
-FROM rust:1.69 as builder
-COPY . /app
-WORKDIR /app
-COPY --from=cacher /app/target target
-COPY --from=cacher /usr/local/cargo /usr/local/cargo
-RUN cargo build --release
+# Create appuser
+ENV USER=vim_dictionary_backend
+ENV UID=10001
 
-# runtime image
-FROM gcr.io/distroless/cc-debian11
-COPY --from=builder /app/target/release/vim_dictionary_backend /app/vim_dictionary_backend
-COPY .env .env
-WORKDIR /app
-CMD ["./vim_dictionary_backend"]
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --no-create-home \
+    --uid "${UID}" \
+    "${USER}"
 
+
+WORKDIR /vim_dictionary_backend
+
+COPY ./ .
+
+RUN cargo build --target x86_64-unknown-linux-musl --release
+
+####################################################################################################
+## Final image
+####################################################################################################
+FROM alpine:latest
+
+# Import from builder.
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+WORKDIR /vim_dictionary_backend
+
+# Copy our build
+COPY --from=builder /vim_dictionary_backend/target/x86_64-unknown-linux-musl/release/vim_dictionary_backend ./
+
+# Use an unprivileged user.
+USER vim_dictionary_backend:vim_dictionary_backend
+
+CMD ["/vim_dictionary_backend/vim_dictionary_backend"]

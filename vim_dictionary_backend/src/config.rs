@@ -35,7 +35,7 @@ impl Config {
                 .parse()
                 .expect("DB_POOL_MAX must be an integer"),
             server_bind: env::var("SERVER_BIND").unwrap_or_else(|_| "127.0.0.1".to_string()),
-            server_port: env::var("SERVER_PORT")
+            server_port: env::var("PORT")
                 .unwrap_or_else(|_| "8080".to_string())
                 .parse()
                 .expect("SERVER_PORT must be an integer"),
