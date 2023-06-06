@@ -95,6 +95,7 @@ export const IconLink = styled.a`
   margin-left: 1rem;
   margin-right: 1rem;
   margin-top: 0.5rem;
+  padding-bottom: 10px;
 
   @media (max-width: 600px) {
     font-size: 5vw;
