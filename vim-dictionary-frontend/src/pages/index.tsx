@@ -281,13 +281,6 @@ export default function Home() {
 
       <Title>Vim Dictionary</Title>
       <Terminal>
-        <label htmlFor="mode">Mode:</label>
-        <ModeSelect id="mode" value={mode} onChange={handleModeChange}>
-          <option value="Normal">Normal</option>
-          <option value="Visual">Visual</option>
-          <option value="Insert">Insert</option>
-          <option value="Command">Command</option>
-        </ModeSelect>
         <label htmlFor="search">Search:</label>
         <SearchRow>
           <SearchInput
