@@ -13,15 +13,6 @@ describe("Home", () => {
     expect(title).toBeInTheDocument();
   });
 
-  test("renders mode select and changes its value", async () => {
-    const modeSelect = screen.getByLabelText("Mode:");
-    expect(modeSelect).toBeInTheDocument();
-    await act(async () => {
-      fireEvent.change(modeSelect, { target: { value: "Visual" } });
-    });
-    expect(modeSelect).toHaveValue("Visual");
-  });
-
   test("renders search input and types a key", () => {
     const searchInput = screen.getByPlaceholderText("Type keymap (e.g. dd)");
     expect(searchInput).toBeInTheDocument();

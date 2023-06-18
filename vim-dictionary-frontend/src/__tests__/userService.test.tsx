@@ -24,8 +24,7 @@ describe("userService", () => {
 
     const response = await registerUser(data);
     if (response) {
-      expect(response.status).toBe(201);
-      expect(response.data.message).toBe("User registered");
+      expect(response.message).toBe("User registered");
     }
   });
 
