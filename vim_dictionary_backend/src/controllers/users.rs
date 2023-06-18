@@ -1,6 +1,6 @@
 use crate::models::{Dictionary, Section, Entry, User};
 use actix_identity::Identity;
-use actix_web::{get, post, delete, web, HttpResponse, HttpRequest, Responder};
+use actix_web::{get, post, web, HttpResponse, HttpRequest, Responder};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use jsonwebtoken::{encode, decode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
@@ -14,9 +14,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(register);
     cfg.service(login);
     cfg.service(logout);
-    cfg.service(get_all_users);
-    cfg.service(get_user);
-    cfg.service(delete_user);
     cfg.service(validate_token);
 }
 
@@ -193,41 +190,5 @@ async fn validate_token(req: HttpRequest) -> impl Responder {
             info!("No token received");
             HttpResponse::Unauthorized().finish()
         }
-    }
-}
-
-#[get("/users")]
-async fn get_all_users(pool: web::Data<PgPool>) -> impl Responder {
-    let users = sqlx::query_as::<_, User>("SELECT * FROM users")
-        .fetch_all(&**pool)
-        .await
-        .unwrap();
-
-    HttpResponse::Ok().json(users)
-}
-
-#[get("/users/{id}")]
-async fn get_user(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responder {
-    let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE id = $1")
-        .bind(&id.into_inner())
-        .fetch_one(&**pool)
-        .await;
-
-    match user {
-        Ok(user) => HttpResponse::Ok().json(user),
-        Err(_) => HttpResponse::NotFound().finish(),
-    }
-}
-
-#[delete("/users/{id}")]
-async fn delete_user(pool: web::Data<PgPool>, id: web::Path<i32>) -> impl Responder {
-    let result = sqlx::query("DELETE FROM users WHERE id = $1")
-        .bind(&id.into_inner())
-        .execute(&**pool)
-        .await;
-
-    match result {
-        Ok(_) => HttpResponse::NoContent().finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
