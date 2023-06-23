@@ -1156,7 +1156,7 @@ export const keyMappings = [
     description: "exit window, quit",
   },
   {
-    key: ":wq",
+    key: ":q!",
     mode: "EX commands",
     description: "exit window by force, force quit",
   },
