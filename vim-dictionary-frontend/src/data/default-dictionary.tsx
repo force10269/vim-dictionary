@@ -906,6 +906,12 @@ export const keyMappings = [
     description: "create a fold for N lines",
   },
   {
+    key: "zfa}",
+    mode: "Commands starting with 'z'",
+    description:
+      "Create a fold for the current function or class you are hovering over",
+  },
+  {
     key: "zG",
     mode: "Commands starting with 'z'",
     description: "temporarily mark word as correctly spelled",
