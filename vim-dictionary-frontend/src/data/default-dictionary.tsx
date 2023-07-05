@@ -1177,6 +1177,11 @@ export const keyMappings = [
     description: 'same as "l"',
   },
   {
+    key: "<Ctrl>^",
+    mode: "Normal",
+    description: "Go to the previous buffer (or page)."
+  },
+  {
     key: "!",
     mode: "Normal",
     description: "!{motion}{filter}",
