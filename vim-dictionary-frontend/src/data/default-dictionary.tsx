@@ -1182,6 +1182,11 @@ export const keyMappings = [
     description: "Go to the previous buffer (or page)."
   },
   {
+    key: "<Ctrl>r",
+    mode: "Normal",
+    description: "Undo the last change you made. Goes hand in hand with keybinding 'u'",
+  },
+  {
     key: "!",
     mode: "Normal",
     description: "!{motion}{filter}",
