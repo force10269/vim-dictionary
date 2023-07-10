@@ -912,6 +912,12 @@ export const keyMappings = [
       "Create a fold for the current function or class you are hovering over",
   },
   {
+    key: "zf%",
+    mode: "Commands starting with 'z'",
+    description:
+      "Create a fold for the current line until the matching closed bracket/parenthesis",
+  },
+  {
     key: "zG",
     mode: "Commands starting with 'z'",
     description: "temporarily mark word as correctly spelled",
@@ -1179,12 +1185,13 @@ export const keyMappings = [
   {
     key: "<Ctrl>^",
     mode: "Normal",
-    description: "Go to the previous buffer (or page)."
+    description: "Go to the previous buffer (or page).",
   },
   {
     key: "<Ctrl>r",
     mode: "Normal",
-    description: "Undo the last change you made. Goes hand in hand with keybinding 'u'",
+    description:
+      "Undo the last change you made. Goes hand in hand with keybinding 'u'",
   },
   {
     key: "!",
